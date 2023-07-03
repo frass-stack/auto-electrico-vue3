@@ -3,24 +3,71 @@
     <!-- Este es el componente que usa useApi para el store de luces -->
     <h2>Componente de luces</h2>
     <!-- Estos son los botones para ejecutar las acciones de las luces -->
-    <button @click="encenderLuzAlta">Encender luz alta</button>
-    <button @click="apagarLuzAlta">Apagar luz alta</button>
-    <button @click="encenderBalizas">Encender balizas</button>
-    <button @click="apagarBalizas">Apagar balizas</button>
-    <button @click="encenderLuzBaja">Encender luz baja</button>
-    <button @click="apagarLuzBaja">Apagar luz baja</button>
-    <button @click="encenderLuzInterior">Encender luz interior</button>
-    <button @click="apagarLuzInterior">Apagar luz interior</button>
-    <button @click="encenderReflector">Encender reflector</button>
-    <button @click="apagarReflector">Apagar reflector</button>
+    <div v-if="!lucesAltasYBajas">
+      <button @click="encenderLuzAlta" class="boton-imagen">
+        Encender luz alta
+        <img v-bind:src="lucesAltasIn" alt="safaty" class="imagen-boton" />
+      </button>
+    </div>
+    <div v-else>
+      <button @click="apagarLuzAlta">Apagar luz alta</button>
+    </div>
+
+    <div v-if="!balizas">
+      <button @click="encenderBalizas" class="boton-imagen">
+        Encender balizas
+        <img v-bind:src="balizasIn" alt="balizas" class="imagen-boton" />
+      </button>
+    </div>
+    <div v-else>
+      <button @click="apagarBalizas" class="boton-imagen">
+        Apagar balizas
+        <img v-bind:src="balizasOut" alt="balizas-out" class="imagen-boton" />
+      </button>
+    </div>
+
+    <div v-if="!lucesAltasYBajas">
+      <button @click="encenderLuzBaja">Encender luz baja</button>
+    </div>
+    <div v-else>
+      <button @click="apagarLuzBaja">Apagar luz baja</button>
+    </div>
+
+    <div v-if="!luzInterior">
+      <button @click="encenderLuzInterior" class="boton-imagen">
+        Encender luz interior
+        <img v-bind:src="luzInteriorIn" alt="safaty" class="imagen-boton" />
+      </button>
+    </div>
+    <div v-else>
+      <button @click="apagarLuzInterior">Apagar luz interior</button>
+    </div>
+
+    <div v-if="!reflector">
+      <button @click="encenderReflector" class="boton-imagen">
+        Encender reflector
+        <img v-bind:src="reflectorIn" alt="safaty" class="imagen-boton" />
+      </button>
+    </div>
+    <div v-else>
+      <button @click="apagarReflector">Apagar reflector</button>
+    </div>
+
     <!-- Este es el párrafo para mostrar el estado de las luces -->
     <p>{{ mostrarEstadoDeLuces() }}</p>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 // Importamos el composable general
 import { useApi } from '../composables/useApi'
+
+import lucesAltasIn from '../assets/luces/luz-alta-encendida.png';
+import luzInteriorIn from '../assets/luces/luz-interior-in.png';
+import reflectorIn from '../assets/luces/reflector-in.png';
+import balizasIn from '../assets/luces/balizas.jpg';
+import balizasOut from '../assets/luces/balizas-out.png';
 
 // Accedemos al composable general
 const api = useApi()
@@ -42,6 +89,9 @@ const {
 // Accedemos al store de luces
 const {
   lucesAltasYBajas,
+  luzInterior,
+  reflector,
+  balizas,
   activarLucesDeGiro,
   desactivarLucesDeGiro,
   activarBalizas,
@@ -62,6 +112,8 @@ const encenderLuzAlta = async () => {
   // Si la respuesta es exitosa, actualizamos el store de luces
   if (response.status === 200) {
     cambiarLucesAltasYBajas('altas');
+    alta.value = true;
+    baja.value = false;
   }
 };
 
@@ -71,6 +123,8 @@ const apagarLuzAlta = async () => {
   // Si la respuesta es exitosa, actualizamos el store de luces
   if (response.status === 200) {
     cambiarLucesAltasYBajas('apagadas');
+    alta.value = false;
+    baja.value = false
   }
 };
 
@@ -80,6 +134,8 @@ const encenderLuzBaja = async () => {
   // Si la respuesta es exitosa, actualizamos el store de luces
   if (response.status === 200) {
     cambiarLucesAltasYBajas('bajas');
+    baja.value = true;
+    alta.value = false;
   }
 };
 
@@ -89,6 +145,8 @@ const apagarLuzBaja = async () => {
   // Si la respuesta es exitosa, actualizamos el store de luces
   if (response.status === 200) {
     cambiarLucesAltasYBajas('apagadas');
+    baja.value = false;
+    alta.value = false;
   }
 };
 
@@ -165,11 +223,31 @@ const apagarBalizas = async () => {
 }
 
 .luces button {
-  width: 350px;
+  width: 270px;
   /* aumentamos el ancho del botón */
-  height: 40px;
+  height: 70px;
   border-radius: 10px;
   font-size: 16px;
   margin: 3px;
+}
+
+.boton-imagen {
+  /* Usar display flex para alinear los elementos en una fila */
+  display: flex;
+  /* Usar align-items para centrar los elementos verticalmente */
+  align-items: center;
+  /* Usar justify-content para distribuir los elementos equitativamente */
+  justify-content: space-between;
+}
+
+.imagen-boton {
+  /* Usar display block para la imagen */
+  /* display: block; */
+  /* Usar object-fit para ajustar la imagen al contenedor */
+  /* object-fit: cover; */
+  /* Usar width y height para especificar el tamaño de la imagen */
+  width: 60%;
+  height: 60%;
+  margin-left: 10px;
 }
 </style>

@@ -38,7 +38,9 @@ function mostrarEstadoDeLuces() { return luces.mostrarEstadoDeLuces() }
 return { 
     lucesDeGiro, 
     balizas, 
-    lucesAltasYBajas, 
+    lucesAltasYBajas,
+    luzInterior,
+    reflector,
     activarLucesDeGiro,
     desactivarLucesDeGiro, 
     activarBalizas, 

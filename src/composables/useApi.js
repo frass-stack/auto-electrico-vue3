@@ -46,6 +46,8 @@ export function useApi() { // accedemos a los composables de cada store
         lucesDeGiro: luces.lucesDeGiro,
         balizas: luces.balizas,
         lucesAltasYBajas: luces.lucesAltasYBajas,
+        luzInterior: luces.luzInterior,
+        reflector: luces.reflector,
         activarLucesDeGiro: luces.activarLucesDeGiro,
         desactivarLucesDeGiro: luces.desactivarLucesDeGiro,
         activarBalizas: luces.activarBalizas,

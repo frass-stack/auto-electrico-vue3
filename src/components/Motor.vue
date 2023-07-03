@@ -131,8 +131,8 @@ const apagarMotorVehiculo = async function() {
   /* Usar object-fit para ajustar la imagen al contenedor */
   /* object-fit: cover; */
   /* Usar width y height para especificar el tamaño de la imagen */
-  width: 100%;
-  height: 100%;
+  width: 60%;
+  height: 60%;
   margin-left: 10px;
 }
 </style>
