@@ -1,5 +1,6 @@
 import { motorService } from '../services/motorService';
 import { lucesService } from '../services/lucesService';
+import { cocheService } from '../services/cocheService';
 
 //Composables
 import { useCoche } from './useCoche.js'
@@ -18,7 +19,7 @@ export function useApi() { // accedemos a los composables de cada store
     const { luzAltaEncenderAPI, luzAltaApagarAPI, LuzInteriorApagarAPI, LuzInteriorEncenderAPI,
         luzBajaApagarAPI, luzBajaEncenderAPI, reflectorApagarAPI, reflectorEncenderAPI,
         balizasEncenderAPI, balizasApagarAPI } = lucesService();
-
+    const { abrirPuertasAPI, cerrarPuertasAPI } = cocheService();
     // devolvemos las propiedades y funciones que queremos exponer 
     return {
         // coche 
@@ -34,6 +35,12 @@ export function useApi() { // accedemos a los composables de cada store
         resetearVelocimetro: coche.resetearVelocimetro,
         resetearOdometro: coche.resetearOdometro,
         mostrarEstadoDeCoche: coche.mostrarEstadoDeCoche,
+        aperturaPuertas: async function () {
+            return await abrirPuertasAPI()
+        },
+        cierrePuertas: async function () {
+            return await cerrarPuertasAPI()
+        },
 
         // luces
         lucesDeGiro: luces.lucesDeGiro,

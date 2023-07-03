@@ -3,8 +3,8 @@
     <h2>Componente de coche</h2>
     <!-- Estos son los botones para ejecutar las acciones del coche -->
     <button @click="abrocharCinturones">Abrochar cinturones</button>
-    <button @click="abrirPuertas">Abrir puertas</button>
-    <button @click="cerrarPuertas">Cerrar puertas</button>
+    <button @click="aperturaPuertas">Abrir puertas</button>
+    <button @click="cierrePuertas">Cerrar puertas</button>
     <button @click="acelerar(10)">Acelerar 10 km/h</button>
     <button @click="frenar(10)">Frenar 10 km/h</button>
     <button @click="resetearVelocimetro">Resetear velocímetro</button>
@@ -35,6 +35,22 @@ export default {
       resetearVelocimetro: api.resetearVelocimetro,
       resetearOdometro: api.resetearOdometro,
       mostrarEstadoDeCoche: api.mostrarEstadoDeCoche,
+      aperturaPuertas: async function(){
+        // Llamamos al método del service y esperamos la respuesta
+        const response = await api.aperturaPuertas();
+        // Si la respuesta es exitosa, actualizamos el store de luces
+        if (response.status === 200) {
+          this.abrirPuertas()
+        }
+      },
+      cierrePuertas: async function () {
+        // Llamamos al método del service y esperamos la respuesta
+        const response = await api.cierrePuertas();
+        // Si la respuesta es exitosa, actualizamos el store de luces
+        if (response.status === 200) {
+          this.cerrarPuertas()
+        }
+      }
     }
   },
 }
