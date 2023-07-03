@@ -1,4 +1,4 @@
-import { apiService } from '../services/postService'
+import { motorService } from '../services/motorService'
 
 //Composables
 import { useCoche } from './useCoche.js'
@@ -13,7 +13,7 @@ export function useApi() { // accedemos a los composables de cada store
     const motor = useMotor()
 
     //Desestructuracion de los metodos del service
-    const { addValuesAPI } = apiService();
+    const { encenderMotorAPI } = motorService();
 
     // devolvemos las propiedades y funciones que queremos exponer 
     return { 
@@ -85,7 +85,7 @@ export function useApi() { // accedemos a los composables de cada store
          };
          // Llamar al método del service que envía los datos al backend
          // y devolver la respuesta
-         return addValuesAPI(datos);
+         return encenderMotorAPI(datos);
        }
     }
 }

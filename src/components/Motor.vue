@@ -22,6 +22,8 @@ import { ref } from 'vue' // Importar ref para crear una variable reactiva
 
 // Accedemos al composable general
 const api = useApi()
+// Crear una variable reactiva para guardar el mensaje
+const mensaje = ref('')
 
 // Usamos const para declarar las propiedades y funciones que queremos usar en el template
 
@@ -49,8 +51,6 @@ const enviarInformacionYEncenderMotor = async function() {
     mensaje.value = 'Ha ocurrido un error al enviar la información o al encender el motor.'
   }
 }
-// Crear una variable reactiva para guardar el mensaje
-const mensaje = ref('')
 </script>
 
 <style>
