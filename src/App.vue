@@ -2,7 +2,7 @@
 <template>
   <div id="app">
     <!-- Este es el componente raíz de la app -->
-    <h1>App</h1>
+    <h1>Sistema Automovil Electrico</h1>
     <!-- Este es el menú para navegar entre los componentes -->
     <nav>
       <ul>

@@ -4,13 +4,25 @@
     <h2>Componente de motor</h2>
     <!-- Estos son los botones para ejecutar las acciones del motor -->
     <div v-if="encendido">
-      <button @click="enviarInformacionYEncenderMotor">Encender/Apagar</button> <!-- este es el nuevo botón -->
+      <button @click="enviarInformacionYEncenderMotor" class="boton-imagen">
+        Encender/Apagar
+        <img v-bind:src="power" alt="Power" class="imagen-boton" />
+      </button> <!-- este es el nuevo botón -->
     </div>
     <div v-else>
-      <button @click="apagarMotorVehiculo">Encender/Apagar</button> <!-- este es el nuevo botón -->
+      <button @click="apagarMotorVehiculo" class="boton-imagen">
+        Encender/Apagar
+        <img v-bind:src="offPower" alt="Power" class="imagen-boton" />
+      </button> <!-- este es el nuevo botón -->
     </div>
-    <button @click="cargarBateria(10)">Cargar batería 10 unidades</button>
-    <button @click="consumirBateria(10)">Consumir batería 10 km</button>
+    <button @click="cargarBateria(10)" class="boton-imagen">
+      Cargar batería 10 unidades
+      <img v-bind:src="bateryCharge" alt="Battery" class="imagen-boton" />
+    </button>
+    <button @click="consumirBateria(10)" class="boton-imagen">
+      Consumir batería 10 km
+      <img v-bind:src="bateryUncharge" alt="Battery" class="imagen-boton" />
+    </button>
     <button @click="resetearBateria">Resetear batería</button>
     <!-- Estos son los párrafos para mostrar el estado del motor -->
     <p>El motor está {{ encendido ? 'encendido' : 'apagado' }}</p> <!-- este es el nuevo párrafo -->
@@ -24,6 +36,18 @@
 // Importamos el composable general
 import { useApi } from '../composables/useApi'
 import { ref } from 'vue' // Importar ref para crear una variable reactiva
+
+// Importamos las imágenes que queremos usar
+import powerImg from '../assets/motor/encenderMotor.jpg'
+import offPowerImg from '../assets/motor/apagarMotor.jpg'
+import bateryChargeImg from '../assets/motor/cargaBateria.png'
+import bateryUnchargeImg from '../assets/motor/descargaBateria.png'
+
+// Asignamos las imágenes importadas a unas propiedades del objeto data
+const power = powerImg
+const offPower = offPowerImg
+const bateryCharge = bateryChargeImg
+const bateryUncharge = bateryUnchargeImg
 
 // Accedemos al composable general
 const api = useApi()
@@ -85,9 +109,30 @@ const apagarMotorVehiculo = async function() {
 }
 
 .motor button {
-  width: 200px;
-  height: 40px;
+  width: 230px;
+  height: 70px;
   border-radius: 10px;
   font-size: 16px;
+  margin: 3px;
+}
+
+.boton-imagen {
+  /* Usar display flex para alinear los elementos en una fila */
+  display: flex;
+  /* Usar align-items para centrar los elementos verticalmente */
+  align-items: center;
+  /* Usar justify-content para distribuir los elementos equitativamente */
+  justify-content: space-between;
+}
+
+.imagen-boton {
+  /* Usar display block para la imagen */
+  /* display: block; */
+  /* Usar object-fit para ajustar la imagen al contenedor */
+  /* object-fit: cover; */
+  /* Usar width y height para especificar el tamaño de la imagen */
+  width: 100%;
+  height: 100%;
+  margin-left: 10px;
 }
 </style>
