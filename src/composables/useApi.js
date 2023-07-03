@@ -117,23 +117,23 @@ export function useApi() { // accedemos a los composables de cada store
         // Añadir este método al objeto que se devuelve
         enviarInformacionYEncenderMotor: async function () {
             // Obtener los datos que se quieren enviar al backend
-            let datos = {
-                cinturonesDeSeguridad: this.cinturonesDeSeguridad,
-                puertas: this.puertas,
-                velocimetro: this.velocimetro,
-                odometro: this.odometro,
-                lucesDeGiro: this.lucesDeGiro,
-                balizas: this.balizas,
-                lucesAltasYBajas: this.lucesAltasYBajas,
-                usuarioActual: this.usuarioActual,
-                invitados: this.invitados,
-                encendido: this.encendido,
-                cargaBateria: this.cargaBateria,
-                autonomiaBateria: this.autonomiaBateria
-            };
+            // let datos = {
+            //     cinturonesDeSeguridad: this.cinturonesDeSeguridad,
+            //     puertas: this.puertas,
+            //     velocimetro: this.velocimetro,
+            //     odometro: this.odometro,
+            //     lucesDeGiro: this.lucesDeGiro,
+            //     balizas: this.balizas,
+            //     lucesAltasYBajas: this.lucesAltasYBajas,
+            //     usuarioActual: this.usuarioActual,
+            //     invitados: this.invitados,
+            //     encendido: this.encendido,
+            //     cargaBateria: this.cargaBateria,
+            //     autonomiaBateria: this.autonomiaBateria
+            // };
             // Llamar al método del service que envía los datos al backend
             // y devolver la respuesta
-            return encenderMotorAPI(datos);
+            return encenderMotorAPI();
         },
         apagarMotorVehiculo: async function () {
             return apagarMotorAPI();

@@ -1,7 +1,7 @@
 import { api } from "../config/index";
 
 export const motorService = () => {
-    const encenderMotorAPI = async (datos) => {
+    const encenderMotorAPI = async () => {
         // console.log(datos);
         console.log('enviando datos al back')
         // const resp = await api.post(

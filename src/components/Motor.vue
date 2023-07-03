@@ -3,7 +3,7 @@
     <!-- Este es el componente que usa useApi para el store de motor -->
     <h2>Componente de motor</h2>
     <!-- Estos son los botones para ejecutar las acciones del motor -->
-    <div v-if="encendido">
+    <div v-if="!encendido">
       <button @click="enviarInformacionYEncenderMotor" class="boton-imagen">
         Encender/Apagar
         <img v-bind:src="power" alt="Power" class="imagen-boton" />
