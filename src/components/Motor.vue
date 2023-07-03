@@ -3,7 +3,12 @@
     <!-- Este es el componente que usa useApi para el store de motor -->
     <h2>Componente de motor</h2>
     <!-- Estos son los botones para ejecutar las acciones del motor -->
-    <button @click="enviarInformacionYEncenderMotor">Encender/Apagar</button> <!-- este es el nuevo botón -->
+    <div v-if="encendido">
+      <button @click="enviarInformacionYEncenderMotor">Encender/Apagar</button> <!-- este es el nuevo botón -->
+    </div>
+    <div v-else>
+      <button @click="apagarMotorVehiculo">Encender/Apagar</button> <!-- este es el nuevo botón -->
+    </div>
     <button @click="cargarBateria(10)">Cargar batería 10 unidades</button>
     <button @click="consumirBateria(10)">Consumir batería 10 km</button>
     <button @click="resetearBateria">Resetear batería</button>
@@ -39,6 +44,22 @@ const enviarInformacionYEncenderMotor = async function() {
   try {
     // Llamar al método del composable y esperar la respuesta
     const response = await api.enviarInformacionYEncenderMotor()
+    // Si la respuesta es exitosa, actualizar el estado del motor a encendido
+    if (response.status === 200) {
+      toggleEncendido()
+    }
+    // Mostrar un mensaje de confirmación o de error según el caso
+    mensaje.value = response.message
+  } catch (error) {
+    // Si hay algún error, mostrarlo en la consola y en el mensaje
+    console.error(error)
+    mensaje.value = 'Ha ocurrido un error al enviar la información o al encender el motor.'
+  }
+}
+const apagarMotorVehiculo = async function() {
+  try {
+    // Llamar al método del composable y esperar la respuesta
+    const response = await api.apagarMotorVehiculo()
     // Si la respuesta es exitosa, actualizar el estado del motor a encendido
     if (response.status === 200) {
       toggleEncendido()

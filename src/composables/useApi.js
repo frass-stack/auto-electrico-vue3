@@ -15,7 +15,7 @@ export function useApi() { // accedemos a los composables de cada store
     const motor = useMotor()
 
     //Desestructuracion de los metodos del service
-    const { encenderMotorAPI } = motorService();
+    const { encenderMotorAPI, apagarMotorAPI } = motorService();
     const { luzAltaEncenderAPI, luzAltaApagarAPI, LuzInteriorApagarAPI, LuzInteriorEncenderAPI,
         luzBajaApagarAPI, luzBajaEncenderAPI, reflectorApagarAPI, reflectorEncenderAPI,
         balizasEncenderAPI, balizasApagarAPI } = lucesService();
@@ -132,6 +132,9 @@ export function useApi() { // accedemos a los composables de cada store
             // Llamar al método del service que envía los datos al backend
             // y devolver la respuesta
             return encenderMotorAPI(datos);
+        },
+        apagarMotorVehiculo: async function () {
+            return apagarMotorAPI();
         }
     }
 }
