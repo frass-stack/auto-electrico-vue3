@@ -1,4 +1,5 @@
-import { motorService } from '../services/motorService'
+import { motorService } from '../services/motorService';
+import { lucesService } from '../services/lucesService';
 
 //Composables
 import { useCoche } from './useCoche.js'
@@ -14,9 +15,12 @@ export function useApi() { // accedemos a los composables de cada store
 
     //Desestructuracion de los metodos del service
     const { encenderMotorAPI } = motorService();
+    const { luzAltaEncenderAPI, luzAltaApagarAPI, LuzInteriorApagarAPI, LuzInteriorEncenderAPI,
+        luzBajaApagarAPI, luzBajaEncenderAPI, reflectorApagarAPI, reflectorEncenderAPI,
+        balizasEncenderAPI, balizasApagarAPI } = lucesService();
 
     // devolvemos las propiedades y funciones que queremos exponer 
-    return { 
+    return {
         // coche 
         cinturonesDeSeguridad: coche.cinturonesDeSeguridad,
         puertas: coche.puertas,
@@ -41,7 +45,42 @@ export function useApi() { // accedemos a los composables de cada store
         desactivarBalizas: luces.desactivarBalizas,
         cambiarLucesAltasYBajas: luces.cambiarLucesAltasYBajas,
         apagarTodasLasLuces: luces.apagarTodasLasLuces,
+        activarLuzInterior: luces.activarLuzInterior,
+        desactivarLuzInterior: luces.desactivarLuzInterior,
+        activarReflector: luces.activarReflector,
+        desactivarReflector: luces.desactivarReflector,
         mostrarEstadoDeLuces: luces.mostrarEstadoDeLuces,
+        //Services Luces
+        luzAltaEncender: async function () {
+            return await luzAltaEncenderAPI();
+        },
+        luzAltaApagar: async function () {
+            return await luzAltaApagarAPI();
+        },
+        luzBajaEncender: async function () {
+            return await luzBajaEncenderAPI();
+        },
+        luzBajaApagar: async function () {
+            return await luzBajaApagarAPI();
+        },
+        LuzInteriorEncender: async function () {
+            return await LuzInteriorEncenderAPI()
+        },
+        LuzInteriorApagar: async function () {
+            return await LuzInteriorApagarAPI()
+        },
+        reflectorEncender: async function () {
+            return await reflectorEncenderAPI()
+        },
+        reflectorApagar: async function () {
+            return await reflectorApagarAPI()
+        },
+        balizasEncender: async function () {
+            return await balizasEncenderAPI()
+        },
+        balizasApagar: async function () {
+            return await balizasApagarAPI()
+        },
 
         // usuario
         usuarioActual: usuario.usuarioActual,
@@ -66,26 +105,26 @@ export function useApi() { // accedemos a los composables de cada store
         resetearBateria: motor.resetearBateria,
         mostrarEstadoDeBateria: motor.mostrarEstadoDeBateria,
 
-       // Añadir este método al objeto que se devuelve
-       enviarInformacionYEncenderMotor: async function() {
-         // Obtener los datos que se quieren enviar al backend
-         let datos = {
-           cinturonesDeSeguridad: this.cinturonesDeSeguridad,
-           puertas: this.puertas,
-           velocimetro: this.velocimetro,
-           odometro: this.odometro,
-           lucesDeGiro: this.lucesDeGiro,
-           balizas: this.balizas,
-           lucesAltasYBajas: this.lucesAltasYBajas,
-           usuarioActual: this.usuarioActual,
-           invitados: this.invitados,
-           encendido: this.encendido,
-           cargaBateria: this.cargaBateria,
-           autonomiaBateria: this.autonomiaBateria
-         };
-         // Llamar al método del service que envía los datos al backend
-         // y devolver la respuesta
-         return encenderMotorAPI(datos);
-       }
+        // Añadir este método al objeto que se devuelve
+        enviarInformacionYEncenderMotor: async function () {
+            // Obtener los datos que se quieren enviar al backend
+            let datos = {
+                cinturonesDeSeguridad: this.cinturonesDeSeguridad,
+                puertas: this.puertas,
+                velocimetro: this.velocimetro,
+                odometro: this.odometro,
+                lucesDeGiro: this.lucesDeGiro,
+                balizas: this.balizas,
+                lucesAltasYBajas: this.lucesAltasYBajas,
+                usuarioActual: this.usuarioActual,
+                invitados: this.invitados,
+                encendido: this.encendido,
+                cargaBateria: this.cargaBateria,
+                autonomiaBateria: this.autonomiaBateria
+            };
+            // Llamar al método del service que envía los datos al backend
+            // y devolver la respuesta
+            return encenderMotorAPI(datos);
+        }
     }
 }

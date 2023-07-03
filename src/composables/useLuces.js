@@ -8,6 +8,8 @@ export function useLuces() { // accedemos al store de luces
 const lucesDeGiro = computed(() => luces.lucesDeGiro) 
 const balizas = computed(() => luces.balizas) 
 const lucesAltasYBajas = computed(() => luces.lucesAltasYBajas)
+const luzInterior = computed(() => luces.luzInterior)
+const reflector = computed(() => luces.reflector)
 
 // creamos unas funciones para ejecutar las acciones de las luces 
 function activarLucesDeGiro(lado) { luces.activarLucesDeGiro(lado) }
@@ -22,6 +24,14 @@ function cambiarLucesAltasYBajas() { luces.cambiarLucesAltasYBajas() }
 
 function apagarTodasLasLuces() { luces.apagarTodasLasLuces() }
 
+function activarLuzInterior() { luces.activarLuzInterior() }
+
+function desactivarLuzInterior() { luces.desactivarLuzInterior() }
+
+function activarReflector() { luces.activarReflector() }
+
+function desactivarReflector() { luces.desactivarReflector() }
+
 function mostrarEstadoDeLuces() { return luces.mostrarEstadoDeLuces() }
 
 // devolvemos las propiedades y funciones que queremos exponer 
@@ -34,6 +44,10 @@ return {
     activarBalizas, 
     desactivarBalizas, 
     cambiarLucesAltasYBajas, 
-    apagarTodasLasLuces, 
+    apagarTodasLasLuces,
+    activarLuzInterior,
+    desactivarLuzInterior,
+    activarReflector,
+    desactivarReflector,
     mostrarEstadoDeLuces 
 }}
