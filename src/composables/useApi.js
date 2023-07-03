@@ -1,3 +1,6 @@
+import { apiService } from '../services/postService'
+
+//Composables
 import { useCoche } from './useCoche.js'
 import { useLuces } from './useLuces.js'
 import { useUsuario } from './useUsuario.js'
@@ -8,6 +11,9 @@ export function useApi() { // accedemos a los composables de cada store
     const luces = useLuces()
     const usuario = useUsuario()
     const motor = useMotor()
+
+    //Desestructuracion de los metodos del service
+    const { addValuesAPI } = apiService();
 
     // devolvemos las propiedades y funciones que queremos exponer 
     return { 
@@ -59,5 +65,27 @@ export function useApi() { // accedemos a los composables de cada store
         consumirBateria: motor.consumirBateria,
         resetearBateria: motor.resetearBateria,
         mostrarEstadoDeBateria: motor.mostrarEstadoDeBateria,
+
+       // Añadir este método al objeto que se devuelve
+       enviarInformacionYEncenderMotor: async function() {
+         // Obtener los datos que se quieren enviar al backend
+         let datos = {
+           cinturonesDeSeguridad: this.cinturonesDeSeguridad,
+           puertas: this.puertas,
+           velocimetro: this.velocimetro,
+           odometro: this.odometro,
+           lucesDeGiro: this.lucesDeGiro,
+           balizas: this.balizas,
+           lucesAltasYBajas: this.lucesAltasYBajas,
+           usuarioActual: this.usuarioActual,
+           invitados: this.invitados,
+           encendido: this.encendido,
+           cargaBateria: this.cargaBateria,
+           autonomiaBateria: this.autonomiaBateria
+         };
+         // Llamar al método del service que envía los datos al backend
+         // y devolver la respuesta
+         return addValuesAPI(datos);
+       }
     }
 }
