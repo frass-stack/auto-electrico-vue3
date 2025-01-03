@@ -1,50 +1,44 @@
 <template>
   <div class="coche">
-    <h2>Componente de coche</h2>
-    <!-- Estos son los botones para ejecutar las acciones del coche -->
-    <button @click="abrocharCinturones" class="boton-imagen" >
-      Abrochar cinturones
-      <div v-if="cinturones">
-        <img v-bind:src="cinturonesIn" alt="safaty" class="imagen-boton" />
-      </div>
-      <div v-else>
-        <img v-bind:src="cinturonesOut" alt="unsafety" class="imagen-boton" />
-      </div>
-    </button>
+    <h1>Control del Coche</h1>
 
-    <div v-if="!puertas">
-      <button @click="aperturaPuertas" class="boton-imagen" >
-        Abrir puertas
-        <img v-bind:src="puertasIn" alt="unsafety" class="imagen-boton" />
-      </button>
-    </div>
-    <div v-else>
-      <button @click="cierrePuertas" class="boton-imagen" >
-        Cerrar puertas
-        <img v-bind:src="puertasOut" alt="unsafety" class="imagen-boton" />
-      </button>
+    <!-- Sección de estado visual -->
+    <div class="estado-coche">
+      <div class="tarjeta">
+        <img :src="cinturones ? cinturonesIn : cinturonesOut" alt="Estado Cinturones" />
+        <h3>{{ cinturones ? 'Cinturones abrochados' : 'Cinturones desabrochados' }}</h3>
+        <button @click="abrocharCinturones" class="btn">
+          {{ cinturones ? 'Desabrochar' : 'Abrochar' }}
+        </button>
+      </div>
+
+      <div class="tarjeta">
+        <img :src="puertas ? puertasOut : puertasIn" alt="Estado Puertas" />
+        <h3>{{ puertas ? 'Puertas cerradas' : 'Puertas abiertas' }}</h3>
+        <button @click="puertas ? cierrePuertas() : aperturaPuertas()" class="btn">
+          {{ puertas ? 'Abrir puertas' : 'Cerrar puertas' }}
+        </button>
+      </div>
     </div>
 
-    <button @click="acelerar(10)">
-      Acelerar 10 km/h
-    </button>
-    <button @click="frenar(10)">
-      Frenar 10 km/h
-    </button>
-    <button @click="resetearVelocimetro">
-      Resetear velocímetro
-    </button>
-    <button @click="resetearOdometro">
-      Resetear odómetro
-    </button>
-    <!-- Este es el párrafo para mostrar el estado del coche -->
-    <p>{{ mostrarEstadoDeCoche() }}</p>
+    <!-- Controles del coche -->
+    <div class="controles">
+      <h2>Controles de Velocidad</h2>
+      <div class="botones">
+        <button @click="acelerar(10)" class="btn">Acelerar +10 km/h</button>
+        <button @click="frenar(10)" class="btn btn-secondary">Frenar -10 km/h</button>
+        <button @click="resetearVelocimetro" class="btn btn-warning">Resetear velocímetro</button>
+        <button @click="resetearOdometro" class="btn btn-danger">Resetear odómetro</button>
+      </div>
+    </div>
+
+    <!-- Estado del coche -->
+    <p class="estado">{{ mostrarEstadoDeCoche() }}</p>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue';
-// Importamos el composable general
 import { useApi } from '../composables/useApi';
 
 import cinturonesPuestos from '../assets/coche/cinturones-puestos.png';
@@ -55,83 +49,146 @@ import puertasCerradas from '../assets/coche/puerta-cerrada.png';
 export default {
   name: 'Coche',
   setup() {
+    const api = useApi();
 
-    // Accedemos al composable general
-    const api = useApi()
-
-    // Devolvemos las propiedades y funciones que queremos usar en el template
     return {
       puertas: api.puertas,
+      cinturones: api.cinturonesDeSeguridad,
       cinturonesIn: cinturonesPuestos,
       cinturonesOut: cinturonesNoPuestos,
       puertasIn: puertasAbiertas,
       puertasOut: puertasCerradas,
-      // coche
-      cinturones: api.cinturonesDeSeguridad,
       abrocharCinturones: api.abrocharCinturones,
-      abrirPuertas: api.abrirPuertas,
-      cerrarPuertas: api.cerrarPuertas,
       acelerar: api.acelerar,
       frenar: api.frenar,
       resetearVelocimetro: api.resetearVelocimetro,
       resetearOdometro: api.resetearOdometro,
       mostrarEstadoDeCoche: api.mostrarEstadoDeCoche,
-      aperturaPuertas: async function(){
-        // Llamamos al método del service y esperamos la respuesta
+      aperturaPuertas: async () => {
         const response = await api.aperturaPuertas();
-        // Si la respuesta es exitosa, actualizamos el store de luces
-        if (response.status === 200) {
-          this.abrirPuertas()
-        }
+        if (response.status === 200) api.abrirPuertas();
       },
-      cierrePuertas: async function () {
-        // Llamamos al método del service y esperamos la respuesta
+      cierrePuertas: async () => {
         const response = await api.cierrePuertas();
-        // Si la respuesta es exitosa, actualizamos el store de luces
-        if (response.status === 200) {
-          this.cerrarPuertas()
-        }
-      }
-    }
+        if (response.status === 200) api.cerrarPuertas();
+      },
+    };
   },
-}
+};
 </script>
 
-<style>
+<style scoped>
+/* Contenedor Principal */
 .coche {
-  background-color: lightblue;
-  border: 2px solid blue;
-  padding: 10px;
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.coche h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* Sección de estado del coche */
+.estado-coche {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.tarjeta {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.coche button {
-  width: 230px;
-  height: 70px;
-  border-radius: 10px;
+.tarjeta img {
+  height: 120px;
+  margin-bottom: 15px;
+}
+
+.tarjeta h3 {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.tarjeta button {
+  margin-top: auto;
+}
+
+/* Controles */
+.controles {
+  margin-bottom: 30px;
+}
+
+.controles h2 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.botones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+/* Botones */
+.btn {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Estado general */
+.estado {
   font-size: 16px;
-  margin: 3px;
-}
-
-.boton-imagen {
-  /* Usar display flex para alinear los elementos en una fila */
-  display: flex;
-  /* Usar align-items para centrar los elementos verticalmente */
-  align-items: center;
-  /* Usar justify-content para distribuir los elementos equitativamente */
-  justify-content: space-between;
-}
-
-.imagen-boton {
-  /* Usar display block para la imagen */
-  /* display: block; */
-  /* Usar object-fit para ajustar la imagen al contenedor */
-  /* object-fit: cover; */
-  /* Usar width y height para especificar el tamaño de la imagen */
-  width: 60%;
-  height: 60%;
-  margin-left: 10px;
+  color: #666;
+  margin-top: 20px;
 }
 </style>
