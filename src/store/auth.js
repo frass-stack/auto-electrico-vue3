@@ -89,6 +89,39 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const register = async ({ name, email, password }) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      // Validar que el email no exista
+      const existingUser = MOCK_USERS.find(u => u.email === email)
+      if (existingUser) {
+        throw new Error('El correo electrónico ya está registrado')
+      }
+
+      // Crear nuevo usuario
+      const newUser = {
+        id: MOCK_USERS.length + 1,
+        email,
+        password,
+        name,
+        role: 'guest' // Por defecto, los nuevos usuarios son invitados
+      }
+
+      // Agregar a la lista de usuarios
+      MOCK_USERS.push(newUser)
+
+      // Iniciar sesión automáticamente
+      return await login({ email, password })
+    } catch (err) {
+      error.value = err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     token,
@@ -96,6 +129,7 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     login,
     logout,
-    checkAuth
+    checkAuth,
+    register
   }
 }) 
