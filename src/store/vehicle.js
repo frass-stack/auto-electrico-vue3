@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { playHorn, startEngineSound, stopEngineSound, updateEngineSound } from '@/utils/sounds'
 
 export const useVehicleStore = defineStore('vehicle', () => {
   // Estado básico
-  const batteryLevel = ref(85)
+  const batteryLevel = ref(20)
   const isEngineOn = ref(false)
   const lights = ref({
     front: false,
@@ -98,10 +98,17 @@ export const useVehicleStore = defineStore('vehicle', () => {
   }
 
   const toggleLight = (light) => {
+    if (batteryLevel.value <= 0 || (!lights.value[light] && batteryLevel.value < 1)) {
+      return false
+    }
     lights.value[light] = !lights.value[light]
+    return true
   }
 
   const toggleHazardLights = () => {
+    if (batteryLevel.value <= 0 || (!hazardLights.value && batteryLevel.value < 2)) {
+      return false
+    }
     hazardLights.value = !hazardLights.value
     if (hazardLights.value) {
       lights.value.front = true
@@ -110,6 +117,7 @@ export const useVehicleStore = defineStore('vehicle', () => {
       lights.value.front = false
       lights.value.rear = false
     }
+    return true
   }
 
   const toggleDoor = (door) => {
@@ -138,17 +146,33 @@ export const useVehicleStore = defineStore('vehicle', () => {
   }
 
   const controlWindow = (window, direction) => {
+    if (batteryLevel.value <= 0 || batteryLevel.value < 0.5) {
+      return false
+    }
+    
     if (direction === 'up' && windows.value[window] < 100) {
       windows.value[window] += 10
+      return true
     } else if (direction === 'down' && windows.value[window] > 0) {
       windows.value[window] -= 10
+      return true
     }
+    return false
   }
 
   const controlAllWindows = (direction) => {
+    const windowCount = Object.keys(windows.value).length
+    if (batteryLevel.value <= 0 || batteryLevel.value < (0.5 * windowCount)) {
+      return false
+    }
+    
+    let success = false
     Object.keys(windows.value).forEach(window => {
-      controlWindow(window, direction)
+      if (controlWindow(window, direction)) {
+        success = true
+      }
     })
+    return success
   }
 
   const soundHorn = () => {
@@ -167,23 +191,18 @@ export const useVehicleStore = defineStore('vehicle', () => {
   }
 
   let simulationInterval
+  let batteryConsumptionInterval
 
   const startSimulation = () => {
+    // Simulación del motor
     simulationInterval = setInterval(() => {
-      // Consumo de batería
-      if (isEngineOn.value && batteryLevel.value > 0) {
-        batteryLevel.value = Math.max(0, batteryLevel.value - 0.1)
-      }
-
-      // Actualizar métricas del motor
       if (isEngineOn.value) {
         motorPerformance.value.temperature = Math.min(100, motorPerformance.value.temperature + 0.1)
         motorPerformance.value.rpm = Math.min(4000, motorPerformance.value.rpm + 100)
         motorPerformance.value.power = Math.min(100, motorPerformance.value.power + 1)
         motorPerformance.value.speed = Math.min(120, (motorPerformance.value.rpm / 4000) * 120)
-        motorPerformance.value.odometer += motorPerformance.value.speed / 3600 // km recorridos por segundo
+        motorPerformance.value.odometer += motorPerformance.value.speed / 3600
         
-        // Actualizar sonido del motor
         updateEngineSound(motorPerformance.value.rpm)
       } else {
         motorPerformance.value.temperature = Math.max(25, motorPerformance.value.temperature - 0.1)
@@ -201,16 +220,77 @@ export const useVehicleStore = defineStore('vehicle', () => {
         power: motorPerformance.value.power
       })
 
-      // Mantener solo los últimos 50 registros
       if (motorPerformance.value.history.length > 50) {
         motorPerformance.value.history.shift()
+      }
+    }, 1000)
+
+    // Consumo de batería (siempre activo)
+    batteryConsumptionInterval = setInterval(() => {
+      if (batteryLevel.value > 0) {
+        let totalConsumption = 0
+
+        // Consumo del motor
+        if (isEngineOn.value) {
+          totalConsumption += 0.5
+        }
+
+        // Consumo de luces
+        Object.values(lights.value).forEach(isOn => {
+          if (isOn) {
+            totalConsumption += 0.2
+          }
+        })
+
+        // Consumo de balizas
+        if (hazardLights.value) {
+          totalConsumption += 0.3
+        }
+
+        // Consumo de ventanas
+        Object.values(windows.value).forEach(position => {
+          if (position > 0) {
+            totalConsumption += 0.15
+          }
+        })
+
+        // Aplicar consumo total
+        batteryLevel.value = Math.max(0, batteryLevel.value - totalConsumption)
+
+        // Si la batería se agota, apagar todo
+        if (batteryLevel.value <= 0) {
+          batteryLevel.value = 0
+          
+          if (isEngineOn.value) {
+            isEngineOn.value = false
+            stopEngineSound()
+          }
+
+          Object.keys(lights.value).forEach(light => {
+            lights.value[light] = false
+          })
+          hazardLights.value = false
+
+          Object.keys(windows.value).forEach(window => {
+            windows.value[window] = 0
+          })
+        }
       }
     }, 1000)
   }
 
   const stopSimulation = () => {
     clearInterval(simulationInterval)
+    clearInterval(batteryConsumptionInterval)
   }
+
+  // Iniciar la simulación inmediatamente al crear el store
+  startSimulation()
+
+  // Limpiar los intervalos cuando se destruye el store
+  onUnmounted(() => {
+    stopSimulation()
+  })
 
   return {
     // Estado
