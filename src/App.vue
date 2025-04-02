@@ -64,6 +64,7 @@ const NAVIGATION_ROUTES = [
   { path: '/luces', name: 'Luces', icon: 'fas fa-lightbulb' },
   { path: '/usuario', name: 'Usuario', icon: 'fas fa-user' },
   { path: '/motor', name: 'Motor', icon: 'fas fa-cog' },
+  { path: '/guest-management', name: 'Gestión de Usuarios', icon: 'fas fa-users', requiresOwner: true },
 ];
 
 export default {
@@ -75,6 +76,12 @@ export default {
 
     const isAuthenticated = computed(() => authStore.checkAuth())
     const user = computed(() => authStore.user)
+    
+    const filteredNavigationRoutes = computed(() => {
+      return NAVIGATION_ROUTES.filter(route => 
+        !route.requiresOwner || user.value?.role === 'owner'
+      )
+    })
 
     const toggleMenu = () => {
       isMenuOpen.value = !isMenuOpen.value
@@ -97,7 +104,7 @@ export default {
       themeStore,
       isAuthenticated,
       user,
-      navigationRoutes: NAVIGATION_ROUTES,
+      navigationRoutes: filteredNavigationRoutes,
       toggleMenu,
       closeMenu,
       toggleTheme,

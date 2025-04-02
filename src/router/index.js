@@ -46,6 +46,12 @@ const router = createRouter({
       name: 'motor',
       component: () => import('@/views/MotorView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/guest-management',
+      name: 'guestManagement',
+      component: () => import('@/views/GuestManagementView.vue'),
+      meta: { requiresAuth: true, requiresOwner: true }
     }
   ]
 })
@@ -53,9 +59,12 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const isAuthenticated = authStore.checkAuth()
+  const isOwner = authStore.user?.role === 'owner'
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
+  } else if (to.meta.requiresOwner && !isOwner) {
+    next('/')
   } else if (to.path === '/login' && isAuthenticated) {
     next('/')
   } else {
