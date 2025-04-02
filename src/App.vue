@@ -1,83 +1,324 @@
 <template>
-  <div id="app">
-    <h1>Sistema Automóvil Eléctrico</h1>
-    <nav>
-      <ul class="nav-bar">
-        <li v-for="route in navigationRoutes" :key="route.path">
-          <router-link :to="route.path" class="nav-link">{{ route.name }}</router-link>
-        </li>
-      </ul>
-    </nav>
-    <router-view />
+  <div id="app" :class="{ 'dark-mode': themeStore.isDarkMode }">
+    <router-view v-if="!isAuthenticated" />
+    
+    <template v-else>
+      <header class="app-header">
+        <div class="header-left">
+          <button class="menu-toggle" @click="toggleMenu" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <h1>Sistema Automóvil Eléctrico</h1>
+        </div>
+        
+        <div class="header-right">
+          <div class="user-info">
+            <span>{{ user?.name }}</span>
+            <span class="user-role" :class="{ 'owner': user?.role === 'owner' }">
+              {{ user?.role === 'owner' ? 'Propietario' : 'Invitado' }}
+            </span>
+            <button class="logout-button" @click="handleLogout">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+          <button class="theme-toggle" @click="toggleTheme" aria-label="Cambiar tema">
+            <i :class="themeIcon"></i>
+          </button>
+        </div>
+      </header>
+      
+      <div class="app-container">
+        <nav :class="{ 'nav-open': isMenuOpen }">
+          <ul class="nav-bar">
+            <li v-for="route in navigationRoutes" :key="route.path">
+              <router-link 
+                :to="route.path" 
+                class="nav-link"
+                @click="closeMenu"
+              >
+                <i :class="route.icon"></i>
+                <span>{{ route.name }}</span>
+              </router-link>
+            </li>
+          </ul>
+        </nav>
+
+        <main class="main-content">
+          <router-view />
+        </main>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
+import { useThemeStore } from './store/theme'
+import { useAuthStore } from './store/auth'
+import { computed, ref } from 'vue'
+
 const NAVIGATION_ROUTES = [
-  { path: '/', name: 'Tablero' },
-  { path: '/coche', name: 'Coche' },
-  { path: '/luces', name: 'Luces' },
-  { path: '/usuario', name: 'Usuario' },
-  { path: '/motor', name: 'Motor' },
+  { path: '/', name: 'Tablero', icon: 'fas fa-tachometer-alt' },
+  { path: '/coche', name: 'Coche', icon: 'fas fa-car' },
+  { path: '/luces', name: 'Luces', icon: 'fas fa-lightbulb' },
+  { path: '/usuario', name: 'Usuario', icon: 'fas fa-user' },
+  { path: '/motor', name: 'Motor', icon: 'fas fa-cog' },
 ];
 
 export default {
   name: 'App',
-  computed: {
-    navigationRoutes() {
-      return NAVIGATION_ROUTES;
-    },
-  },
-};
+  setup() {
+    const isMenuOpen = ref(false)
+    const themeStore = useThemeStore()
+    const authStore = useAuthStore()
+
+    const isAuthenticated = computed(() => authStore.checkAuth())
+    const user = computed(() => authStore.user)
+
+    const toggleMenu = () => {
+      isMenuOpen.value = !isMenuOpen.value
+    }
+
+    const closeMenu = () => {
+      isMenuOpen.value = false
+    }
+
+    const toggleTheme = () => {
+      themeStore.toggleTheme()
+    }
+
+    const handleLogout = () => {
+      authStore.logout()
+    }
+
+    return {
+      isMenuOpen,
+      themeStore,
+      isAuthenticated,
+      user,
+      navigationRoutes: NAVIGATION_ROUTES,
+      toggleMenu,
+      closeMenu,
+      toggleTheme,
+      handleLogout,
+      themeIcon: computed(() => themeStore.isDarkMode ? 'fas fa-sun' : 'fas fa-moon')
+    }
+  }
+}
 </script>
 
 <style>
-/* General Styles */
+:root {
+  --primary-color: #0044cc;
+  --primary-hover: #386ede;
+  --text-color: #2c3e50;
+  --text-color-light: #666;
+  --bg-color: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --border-color: #e1e4e8;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --transition-speed: 0.3s;
+}
+
+.dark-mode {
+  --primary-color: #386ede;
+  --primary-hover: #0044cc;
+  --text-color: #ffffff;
+  --text-color-light: #a0a0a0;
+  --bg-color: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --border-color: #404040;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
 #app {
-  text-align: center;
-  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-h1 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 20px;
+.app-header {
+  background-color: var(--primary-color);
+  color: var(--bg-color);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px var(--shadow-color);
 }
 
-/* Navigation Bar Styles */
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: var(--bg-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform var(--transition-speed);
+}
+
+.logout-button:hover {
+  transform: scale(1.1);
+}
+
+.app-container {
+  display: flex;
+  margin-top: 4rem;
+  min-height: calc(100vh - 4rem);
+}
+
 nav {
-  background-color: #0044cc;
-  padding: 10px 15px;
+  background-color: var(--bg-secondary);
+  width: 250px;
+  height: calc(100vh - 4rem);
+  position: fixed;
+  left: 0;
+  top: 4rem;
+  padding: 1rem;
+  transition: transform var(--transition-speed);
+  border-right: 1px solid var(--border-color);
 }
 
 .nav-bar {
   list-style-type: none;
   display: flex;
-  justify-content: space-around; /* Espacia los elementos horizontalmente */
-  margin: 0;
-  padding: 0;
-}
-
-.nav-bar li {
-  margin: 0; /* Eliminamos márgenes innecesarios */
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .nav-link {
-  color: white;
+  color: var(--text-color);
   text-decoration: none;
-  font-size: 1.2rem;
-  padding: 10px 20px;
-  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: var(--transition-speed);
 }
 
-/* Hover / Active States */
 .nav-link:hover {
-  background-color: #386ede; /* Color más oscuro al pasar el mouse */
-  transition: background-color 0.3s ease;
+  background-color: var(--primary-color);
+  color: var(--bg-color);
 }
 
 .nav-link.router-link-exact-active {
-  font-weight: bold;
-  border-bottom: 2px solid white; /* Marca la ruta activa */
+  background-color: var(--primary-color);
+  color: var(--bg-color);
+  font-weight: 500;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  margin-left: 250px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: var(--bg-color);
+  margin: 5px 0;
+  transition: var(--transition-speed);
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--bg-color);
+  font-size: 1.2rem;
+  transition: transform var(--transition-speed);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  nav {
+    transform: translateX(-100%);
+    z-index: 999;
+  }
+
+  .nav-open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .nav-open .menu-toggle span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .nav-open .menu-toggle span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-open .menu-toggle span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+}
+
+.user-role {
+  font-size: 0.875rem;
+  color: var(--text-color-light);
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  background-color: var(--bg-secondary);
+}
+
+.user-role.owner {
+  background-color: #ffaa00;
+  color: var(--bg-color);
 }
 </style>

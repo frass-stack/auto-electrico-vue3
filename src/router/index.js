@@ -1,45 +1,60 @@
 // router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import Tablero from '../components/Tablero.vue' // importamos el componente Tablero
-import Coche from '../components/Coche.vue' // importamos el componente Coche
-import Luces from '../components/Luces.vue' // importamos el componente Luces
-import Usuario from '../components/Usuario.vue' // importamos el componente Usuario
-import Motor from '../components/Motor.vue' // importamos el componente Motor
+import { useAuthStore } from '../store/auth'
 
-// definimos las rutas
-const routes = [
-  {
-    path: '/',
-    name: 'Tablero',
-    component: Tablero, // este es el componente que se muestra en la ruta raíz
-  },
-  {
-    path: '/coche',
-    name: 'Coche',
-    component: Coche, // este es el componente que se muestra en la ruta /coche
-  },
-  {
-    path: '/luces',
-    name: 'Luces',
-    component: Luces, // este es el componente que se muestra en la ruta /luces
-  },
-  {
-    path: '/usuario',
-    name: 'Usuario',
-    component: Usuario, // este es el componente que se muestra en la ruta /usuario
-  },
-  {
-    path: '/motor',
-    name: 'Motor',
-    component: Motor, // este es el componente que se muestra en la ruta /motor
-  },
-]
-
-// creamos el router
 const router = createRouter({
-  history: createWebHistory(''),
-  routes,
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/components/auth/LoginView.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/',
+      name: 'dashboard',
+      component: () => import('@/views/DashboardView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/coche',
+      name: 'coche',
+      component: () => import('@/views/CocheView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/luces',
+      name: 'luces',
+      component: () => import('@/views/LucesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/usuario',
+      name: 'usuario',
+      component: () => import('@/views/UsuarioView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/motor',
+      name: 'motor',
+      component: () => import('@/views/MotorView.vue'),
+      meta: { requiresAuth: true }
+    }
+  ]
 })
 
-// exportamos el router
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  const isAuthenticated = authStore.checkAuth()
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login')
+  } else if (to.path === '/login' && isAuthenticated) {
+    next('/')
+  } else {
+    next()
+  }
+})
+
 export default router

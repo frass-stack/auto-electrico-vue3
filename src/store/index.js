@@ -1,4 +1,5 @@
 import { createPinia } from 'pinia'
+import { useAuthStore } from './auth'
 
 /*
  * If not building with SSR mode, you can
@@ -9,11 +10,13 @@ import { createPinia } from 'pinia'
  * with the Store instance.
  */
 
-export default store((/* { ssrContext } */) => {
+export default function store(/* { ssrContext } */) {
   const pinia = createPinia()
 
   // You can add Pinia plugins here
   // pinia.use(SomePiniaPlugin)
 
   return pinia
-})
+}
+
+export { useAuthStore }
