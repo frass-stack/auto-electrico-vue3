@@ -45,6 +45,7 @@
         </div>
         <div class="card-content">
           <h3>Última Ubicación</h3>
+          <SimpleMap />
           <p>Última actualización: {{ formatTime(location.lastUpdate) }}</p>
           <p>Estado: {{ isEngineOn ? 'En movimiento' : 'Estacionado' }}</p>
           <p>Coordenadas: {{ location.lat.toFixed(6) }}, {{ location.lng.toFixed(6) }}</p>
@@ -86,9 +87,13 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useVehicleStore } from '@/store/vehicle'
 import Chart from 'chart.js/auto'
+import SimpleMap from '@/components/SimpleMap.vue'
 
 export default {
   name: 'DashboardView',
+  components: {
+    SimpleMap
+  },
   setup() {
     const authStore = useAuthStore()
     const vehicleStore = useVehicleStore()
