@@ -19,6 +19,9 @@
             <span class="user-role" :class="{ 'owner': user?.role === 'owner' }">
               {{ user?.role === 'owner' ? 'Propietario' : 'Invitado' }}
             </span>
+            <button class="test-mqtt-button" @click="testMQTT" title="Probar conexión MQTT">
+              <i class="fas fa-broadcast-tower"></i>
+            </button>
             <button class="logout-button" @click="handleLogout">
               <i class="fas fa-sign-out-alt"></i>
             </button>
@@ -57,6 +60,8 @@
 import { useThemeStore } from './store/theme'
 import { useAuthStore } from './store/auth'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { testMQTTConnection } from './utils/mqttTest'
 
 const NAVIGATION_ROUTES = [
   { path: '/', name: 'Tablero', icon: 'fas fa-tachometer-alt' },
@@ -73,6 +78,7 @@ export default {
     const isMenuOpen = ref(false)
     const themeStore = useThemeStore()
     const authStore = useAuthStore()
+    const router = useRouter()
 
     const isAuthenticated = computed(() => authStore.checkAuth())
     const user = computed(() => authStore.user)
@@ -99,6 +105,10 @@ export default {
       authStore.logout()
     }
 
+    const testMQTT = () => {
+      testMQTTConnection()
+    }
+
     return {
       isMenuOpen,
       themeStore,
@@ -109,6 +119,7 @@ export default {
       closeMenu,
       toggleTheme,
       handleLogout,
+      testMQTT,
       themeIcon: computed(() => themeStore.isDarkMode ? 'fas fa-sun' : 'fas fa-moon')
     }
   }
@@ -343,5 +354,20 @@ nav {
 .user-role.owner {
   background-color: #ffaa00;
   color: var(--bg-color);
+}
+
+.test-mqtt-button {
+  background: none;
+  border: none;
+  color: var(--bg-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform var(--transition-speed);
+  margin-right: 0.5rem;
+}
+
+.test-mqtt-button:hover {
+  transform: scale(1.1);
+  color: #4CAF50;
 }
 </style>

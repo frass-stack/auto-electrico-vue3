@@ -11,7 +11,7 @@ export const useCocheStore = defineStore('coche', {
     }
   },
   actions: {
-    // aquí puedes definir las acciones que modifican el estado, por ejemplo:
+    
     abrocharCinturones() {
       this.cinturonesDeSeguridad = !this.cinturonesDeSeguridad;
     },
@@ -23,12 +23,12 @@ export const useCocheStore = defineStore('coche', {
     },
     acelerar(velocidad) {
       this.velocimetro += velocidad
-      this.odometro += this.velocimetro / 60 // supongamos que cada minuto recorre la distancia de su velocidad actual
+      this.odometro += this.velocimetro / 60
     },
     frenar(velocidad) {
       this.velocimetro -= velocidad
       if (this.velocimetro < 0) {
-        this.velocimetro = 0 // no puede tener velocidad negativa
+        this.velocimetro = 0
       }
       this.odometro += this.velocimetro / 60
     },

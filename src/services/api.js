@@ -13,35 +13,12 @@ const api = axios.create({
 api.interceptors.response.use(
   response => response,
   error => {
-    // Manejar diferentes tipos de errores
     if (error.response) {
-      // El servidor respondió con un estado de error
-      switch (error.response.status) {
-        case 400:
-          console.error('Error de solicitud:', error.response.data)
-          break
-        case 401:
-          console.error('No autorizado:', error.response.data)
-          // Aquí podrías manejar la redirección al login
-          break
-        case 403:
-          console.error('Acceso prohibido:', error.response.data)
-          break
-        case 404:
-          console.error('Recurso no encontrado:', error.response.data)
-          break
-        case 500:
-          console.error('Error del servidor:', error.response.data)
-          break
-        default:
-          console.error('Error:', error.response.data)
-      }
+      console.error(`Error ${error.response.status}:`, error.response.data)
     } else if (error.request) {
-      // La solicitud se realizó pero no se recibió respuesta
-      console.error('Sin respuesta del servidor:', error.request)
+      console.error('Error de red:', error.request)
     } else {
-      // Error al configurar la solicitud
-      console.error('Error de configuración:', error.message)
+      console.error('Error:', error.message)
     }
     return Promise.reject(error)
   }

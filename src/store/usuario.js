@@ -4,13 +4,12 @@ import { defineStore } from 'pinia'
 export const useUsuarioStore = defineStore('usuario', {
   state: () => {
     return {
-      usuarioActual: null, // el usuario que está logueado actualmente
-      usuarios: [], // la lista de usuarios registrados
-      invitados: [], // la lista de invitados con permisos de acceso
+      usuarioActual: null,
+      usuarios: [],
+      invitados: [],
     }
   },
   actions: {
-    // aquí puedes definir las acciones que modifican el estado, por ejemplo:
     registrarUsuario(email, nombre, apellido) {
       // validar que el email no esté en uso
       const usuarioExistente = this.usuarios.find(u => u.email === email)
@@ -21,7 +20,6 @@ export const useUsuarioStore = defineStore('usuario', {
       const nuevoUsuario = { email, nombre, apellido }
       // añadir el nuevo usuario a la lista de usuarios
       this.usuarios.push(nuevoUsuario)
-      // devolver el nuevo usuario creado
       return nuevoUsuario
     },
     loguearUsuario(email) {
@@ -34,7 +32,6 @@ export const useUsuarioStore = defineStore('usuario', {
       this.usuarioActual = usuarioEncontrado
     },
     desloguearUsuario() {
-      // asignar null al usuario actual
       this.usuarioActual = null
     },
     agregarInvitado(email, nombre, apellido) {
@@ -48,7 +45,6 @@ export const useUsuarioStore = defineStore('usuario', {
       const nuevoInvitado = { email, nombre, apellido }
       // añadir el nuevo invitado a la lista de invitados
       this.invitados.push(nuevoInvitado)
-      // devolver el nuevo invitado creado
       return nuevoInvitado
     },
     eliminarInvitado(email) {
@@ -57,7 +53,6 @@ export const useUsuarioStore = defineStore('usuario', {
       if (indiceInvitado === -1) {
         throw new Error('El email no corresponde a ningún invitado')
       }
-      // eliminar el invitado de la lista de invitados
       this.invitados.splice(indiceInvitado, 1)
     },
     mostrarEstadoDeUsuario() {
@@ -81,7 +76,6 @@ export const useUsuarioStore = defineStore('usuario', {
           return `Los invitados con permiso de acceso son: ${this.invitados.map(i => `${i.nombre} ${i.apellido} (${i.email})`).join(', ')}`
         }
       },
-      // etc.
     },
   })
   
