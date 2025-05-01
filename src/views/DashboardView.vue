@@ -62,6 +62,16 @@
           <p>Estado: {{ maintenance.status }}</p>
         </div>
       </div>
+
+      <div class="dashboard-card">
+        <div class="card-icon">
+          <i class="fas fa-share-alt"></i>
+        </div>
+        <div class="card-content">
+          <h3>Compartir Estado</h3>
+          <ShareButtons />
+        </div>
+      </div>
     </div>
 
     <div class="dashboard-charts">
@@ -88,11 +98,13 @@ import { useAuthStore } from '@/store/auth'
 import { useVehicleStore } from '@/store/vehicle'
 import Chart from 'chart.js/auto'
 import SimpleMap from '@/components/SimpleMap.vue'
+import ShareButtons from '@/components/ShareButtons.vue'
 
 export default {
   name: 'DashboardView',
   components: {
-    SimpleMap
+    SimpleMap,
+    ShareButtons
   },
   setup() {
     const authStore = useAuthStore()
@@ -247,7 +259,9 @@ export default {
 
 <style scoped>
 .dashboard {
-  padding: 1rem;
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .dashboard-header {
@@ -257,6 +271,7 @@ export default {
 .dashboard-header h2 {
   color: var(--text-color);
   margin-bottom: 0.5rem;
+  font-size: 1.5rem;
 }
 
 .dashboard-header p {
@@ -265,67 +280,73 @@ export default {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .dashboard-card {
   background-color: var(--bg-secondary);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: transform var(--transition-speed);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border-color);
-}
-
-.dashboard-card:hover {
-  transform: translateY(-5px);
+  height: fit-content;
 }
 
 .card-icon {
   background-color: var(--primary-color);
-  color: var(--bg-color);
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.75rem;
+  color: white;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .card-content {
-  flex: 1;
+  width: 100%;
 }
 
 .card-content h3 {
   color: var(--text-color);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .card-content p {
   color: var(--text-color-light);
   font-size: 0.9rem;
-  margin: 0.25rem 0;
+  margin: 0.5rem 0;
+  line-height: 1.4;
 }
 
+/* Ajustes específicos para la tarjeta del mapa */
+.dashboard-card:nth-child(3) {
+  grid-row: span 2;
+}
+
+/* Ajustes para los botones */
 .action-button {
+  width: 100%;
+  padding: 0.75rem;
   margin-top: 1rem;
-  padding: 0.5rem 1rem;
   background-color: var(--primary-color);
-  color: var(--bg-color);
+  color: white;
   border: none;
   border-radius: 0.5rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color var(--transition-speed);
+  transition: background-color 0.2s, transform 0.2s;
 }
 
 .action-button:hover {
   background-color: var(--primary-hover);
+  transform: translateY(-2px);
 }
 
 .action-button:disabled {
@@ -334,45 +355,67 @@ export default {
 }
 
 .action-button.active {
-  background-color: #ff4444;
+  background-color: #dc3545;
 }
 
 .action-button.active:hover {
-  background-color: #cc3333;
+  background-color: #c82333;
 }
 
+/* Ajustes para los gráficos */
 .dashboard-charts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .chart-container {
   background-color: var(--bg-secondary);
-  border-radius: 1rem;
-  padding: 1.5rem;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
   border: 1px solid var(--border-color);
 }
 
 .chart-container h3 {
   color: var(--text-color);
   margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .chart-placeholder {
-  background-color: var(--bg-color);
-  border-radius: 0.5rem;
-  height: 300px;
-  padding: 1rem;
+  height: 250px;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .dashboard-card:nth-child(3) {
+    grid-column: span 2;
+    grid-row: auto;
+  }
 }
 
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-
+  
+  .dashboard-card:nth-child(3) {
+    grid-column: auto;
+  }
+  
   .dashboard-charts {
     grid-template-columns: 1fr;
+  }
+  
+  .chart-placeholder {
+    height: 200px;
   }
 }
 </style> 
