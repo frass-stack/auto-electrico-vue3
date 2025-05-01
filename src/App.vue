@@ -126,6 +126,8 @@ export default {
   --border-color: #e1e4e8;
   --shadow-color: rgba(0, 0, 0, 0.1);
   --transition-speed: 0.3s;
+  --header-height: 64px;
+  --sidebar-width: 250px;
 }
 
 .dark-mode {
@@ -162,7 +164,7 @@ body {
 .app-header {
   background-color: var(--primary-color);
   color: var(--bg-color);
-  padding: 1rem;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -171,6 +173,7 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
+  height: var(--header-height);
   box-shadow: 0 2px 10px var(--shadow-color);
 }
 
@@ -201,57 +204,60 @@ body {
 
 .app-container {
   display: flex;
-  margin-top: 4rem;
-  min-height: calc(100vh - 4rem);
+  padding-top: var(--header-height);
+  min-height: 100vh;
 }
 
 nav {
   background-color: var(--bg-secondary);
-  width: 250px;
-  height: calc(100vh - 4rem);
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--header-height));
   position: fixed;
   left: 0;
-  top: 4rem;
-  padding: 1rem;
+  top: var(--header-height);
+  padding: 1.5rem 1rem;
   transition: transform var(--transition-speed);
   border-right: 1px solid var(--border-color);
+  overflow-y: auto;
 }
 
 .nav-bar {
   list-style-type: none;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .nav-link {
   color: var(--text-color);
   text-decoration: none;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  transition: var(--transition-speed);
+  gap: 1rem;
+  transition: all var(--transition-speed);
+  font-weight: 500;
 }
 
 .nav-link:hover {
   background-color: var(--primary-color);
   color: var(--bg-color);
+  transform: translateX(4px);
 }
 
 .nav-link.router-link-exact-active {
   background-color: var(--primary-color);
   color: var(--bg-color);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .main-content {
   flex: 1;
-  padding: 2rem;
-  margin-left: 250px;
-  max-width: 1200px;
-  width: 100%;
+  padding: 2rem 2.5rem;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  min-height: calc(100vh - var(--header-height));
 }
 
 .menu-toggle {
@@ -286,6 +292,14 @@ nav {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --header-height: 56px;
+  }
+
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
   .menu-toggle {
     display: block;
   }
@@ -301,6 +315,8 @@ nav {
 
   .main-content {
     margin-left: 0;
+    width: 100%;
+    padding: 1.5rem 1rem;
   }
 
   .nav-open .menu-toggle span:nth-child(1) {
