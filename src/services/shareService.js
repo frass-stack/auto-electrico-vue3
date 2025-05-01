@@ -1,5 +1,6 @@
 import { useVehicleStore } from '@/store/vehicle'
 import { useAuthStore } from '@/store/auth'
+import { emailService } from './emailService'
 
 export const shareService = {
   /**
@@ -41,58 +42,54 @@ export const shareService = {
   },
 
   /**
-   * Comparte el resumen por correo electrónico
+   * Genera el contenido del correo electrónico
    */
-  async shareByEmail() {
-    const summary = this.generateSummary()
-    const subject = 'Estado del Vehículo Eléctrico'
-    const body = `
-Estado del Vehículo:
-- Batería: ${summary.vehiculo.bateria}
-- Autonomía: ${summary.vehiculo.autonomia}
-- Estado: ${summary.vehiculo.estado}
-- Ubicación: ${summary.vehiculo.ubicacion}
-- Próximo servicio: ${summary.vehiculo.mantenimiento.proximoServicio}
-- Estado mantenimiento: ${summary.vehiculo.mantenimiento.estado}
-- Consumo actual: ${summary.vehiculo.consumoEnergia.actual}
-- Consumo promedio: ${summary.vehiculo.consumoEnergia.promedio}
+  generateEmailContent() {
+    const store = useVehicleStore()
+    
+    return `
+      <h2>Estado del Vehículo Eléctrico</h2>
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; border-radius: 10px;">
+        <p><strong>Batería:</strong> ${store.batteryLevel}%</p>
+        <p><strong>Autonomía:</strong> ${store.range} km</p>
+        <p><strong>Estado:</strong> ${store.isEngineOn ? 'En funcionamiento' : 'Apagado'}</p>
+        <p><strong>Ubicación:</strong> ${store.location || 'No disponible'}</p>
+        <p><strong>Próximo servicio:</strong> ${store.maintenance?.nextService || 'No disponible'} km</p>
+        <p><strong>Estado mantenimiento:</strong> ${store.maintenance?.status || 'No disponible'}</p>
+        <p><strong>Consumo actual:</strong> ${store.energyConsumption?.current || '0'} kWh</p>
+        <p><strong>Consumo promedio:</strong> ${store.energyConsumption?.average || '0'} kWh</p>
+      </div>
+    `
+  },
 
-Usuarios:
-Propietario: ${summary.usuarios.propietario.nombre} (${summary.usuarios.propietario.email})
-
-Invitados:
-${summary.usuarios.invitados.map(guest => `- ${guest.nombre} (${guest.email})`).join('\n')}
-`
-    const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    window.location.href = mailtoLink
+  /**
+   * Envía el correo electrónico usando el servicio configurado
+   * @param {Object} data Datos del correo
+   * @param {string} data.to Dirección de correo del destinatario
+   * @param {string} data.subject Asunto del correo
+   */
+  async sendEmail({ to, subject }) {
+    const content = this.generateEmailContent()
+    return await emailService.sendEmail(to, subject, content)
   },
 
   /**
    * Comparte el resumen por WhatsApp
    */
   async shareByWhatsApp() {
-    const summary = this.generateSummary()
-    const message = `
-🚗 *Estado del Vehículo Eléctrico*
+    const store = useVehicleStore()
+    
+    const text = `
+Estado del Vehículo Eléctrico:
+🔋 Batería: ${store.batteryLevel}%
+🛣️ Autonomía: ${store.range} km
+📍 Estado: ${store.isEngineOn ? 'En funcionamiento' : 'Apagado'}
+📌 Ubicación: ${store.location || 'No disponible'}
+🔧 Próximo servicio: ${store.maintenance?.nextService || 'No disponible'} km
+⚡ Consumo actual: ${store.energyConsumption?.current || '0'} kWh
+    `.trim()
 
-*Estado del Vehículo:*
-🔋 Batería: ${summary.vehiculo.bateria}
-🛣️ Autonomía: ${summary.vehiculo.autonomia}
-⚡ Estado: ${summary.vehiculo.estado}
-📍 Ubicación: ${summary.vehiculo.ubicacion}
-🔧 Próximo servicio: ${summary.vehiculo.mantenimiento.proximoServicio}
-📊 Estado mantenimiento: ${summary.vehiculo.mantenimiento.estado}
-⚡ Consumo actual: ${summary.vehiculo.consumoEnergia.actual}
-📈 Consumo promedio: ${summary.vehiculo.consumoEnergia.promedio}
-
-*Usuarios:*
-👤 Propietario: ${summary.usuarios.propietario.nombre}
-📧 Email: ${summary.usuarios.propietario.email}
-
-👥 *Invitados:*
-${summary.usuarios.invitados.map(guest => `- ${guest.nombre} (${guest.email})`).join('\n')}
-`
-    const whatsappLink = `https://wa.me/?text=${encodeURIComponent(message)}`
-    window.open(whatsappLink, '_blank')
+    const encodedText = encodeURIComponent(text)
+    window.open(`https://wa.me/?text=${encodedText}`, '_blank')
   }
 } 
