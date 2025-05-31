@@ -12,7 +12,7 @@ class MQTTService {
   connect() {
     // Usar WebSocket para MQTT
     const brokerUrl = import.meta.env.VITE_MQTT_BROKER_URL || 'wss://42868a8f86294ca1bcb46d95ed80ff5d.s1.eu.hivemq.cloud:8884/mqtt'
-    
+
     this.client = mqtt.connect(brokerUrl, {
       clientId: 'auto_electrico_frontend_' + Math.random().toString(16).substr(2, 8),
       clean: true,
@@ -25,11 +25,12 @@ class MQTTService {
     this.client.on('connect', () => {
       console.log('Conectado al broker MQTT')
       this.connected.value = true
-      
+
       // Resubscribirse a todos los topics
       this.subscriptions.forEach((callback, topic) => {
         this.subscribe(topic, callback)
       })
+      this.publish('frontend/state', 'Inicio')
     })
 
     this.client.on('error', (error) => {
@@ -60,7 +61,7 @@ class MQTTService {
   subscribe(topic, callback) {
     const fullTopic = `${this.topic_prefix}/${topic}`
     this.subscriptions.set(fullTopic, callback)
-    
+
     if (this.client && this.connected.value) {
       this.client.subscribe(fullTopic, (error) => {
         if (error) {

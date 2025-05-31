@@ -6,10 +6,12 @@ import router from './router'
 import api from './services/api'
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
+import { mqttService } from './services/mqtt'
 
 // Crear la aplicación Vue
-const app = createApp(App)
-const pinia = createPinia()
+const app = createApp(App);
+mqttService.connect();
+const pinia = createPinia();
 
 // Configuración global
 app.config.globalProperties.$api = api
@@ -23,18 +25,18 @@ app.config.globalProperties.$filters = {
 }
 
 const toastOptions = {
-    position: "top-right",
-    timeout: 3000,
-    closeOnClick: true,
-    pauseOnFocusLoss: true,
-    pauseOnHover: true,
-    draggable: true,
-    draggablePercent: 0.6,
-    showCloseButtonOnHover: false,
-    hideProgressBar: true,
-    closeButton: "button",
-    icon: true,
-    rtl: false
+  position: "top-right",
+  timeout: 3000,
+  closeOnClick: true,
+  pauseOnFocusLoss: true,
+  pauseOnHover: true,
+  draggable: true,
+  draggablePercent: 0.6,
+  showCloseButtonOnHover: false,
+  hideProgressBar: true,
+  closeButton: "button",
+  icon: true,
+  rtl: false
 }
 
 // Usar plugins
