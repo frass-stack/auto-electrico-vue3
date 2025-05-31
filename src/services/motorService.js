@@ -33,8 +33,13 @@ export const motorService = () => {
         }
     }
 
+    const escucharEstadoMotor = (callback) => {
+        mqttService.subscribe('vehicle/motor/state', callback)
+    }
+
     return {
         encenderMotorAPI,
-        apagarMotorAPI
+        apagarMotorAPI,
+        escucharEstadoMotor
     }
-};
+}

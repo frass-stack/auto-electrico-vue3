@@ -1,5 +1,7 @@
 import { mqttService } from './mqtt'
 
+import { mqttService } from './mqtt'
+
 export const cocheService = () => {
     const enviarComandoPuertas = async (accion) => {
         try {
@@ -17,8 +19,13 @@ export const cocheService = () => {
         }
     }
 
+    const escucharEstadoPuertas = (callback) => {
+        mqttService.subscribe('vehicle/doors/state', callback)
+    }
+
     return {
         abrirPuertasAPI: () => enviarComandoPuertas('abrir'),
-        cerrarPuertasAPI: () => enviarComandoPuertas('cerrar')
+        cerrarPuertasAPI: () => enviarComandoPuertas('cerrar'),
+        escucharEstadoPuertas
     }
 }

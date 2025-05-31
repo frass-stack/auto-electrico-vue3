@@ -21,15 +21,15 @@ class MQTTService {
       username: 'untref',
       password: 'Untref2025'
     })
-
+    // Manejar evento de conexión
     this.client.on('connect', () => {
       console.log('Conectado al broker MQTT')
       this.connected.value = true
-
-      // Resubscribirse a todos los topics
+      // Resuscribirse a todos los tópicos almacenados
       this.subscriptions.forEach((callback, topic) => {
         this.subscribe(topic, callback)
       })
+      // Publicar mensaje inicial indicando que la aplicación está activa
       this.publish('frontend/state', 'Inicio')
     })
 

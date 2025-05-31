@@ -18,6 +18,10 @@ export const lucesService = () => {
         }
     }
 
+    const escucharEstadoLuces = (tipo, callback) => {
+        mqttService.subscribe(`vehicle/lights/${tipo}/state`, callback)
+    }
+
     return {
         luzAltaEncenderAPI: () => enviarComandoLuces('alta', 'encender'),
         luzAltaApagarAPI: () => enviarComandoLuces('alta', 'apagar'),
@@ -28,6 +32,7 @@ export const lucesService = () => {
         reflectorEncenderAPI: () => enviarComandoLuces('reflector', 'encender'),
         reflectorApagarAPI: () => enviarComandoLuces('reflector', 'apagar'),
         balizasEncenderAPI: () => enviarComandoLuces('balizas', 'encender'),
-        balizasApagarAPI: () => enviarComandoLuces('balizas', 'apagar')
+        balizasApagarAPI: () => enviarComandoLuces('balizas', 'apagar'),
+        escucharEstadoLuces
     }
 }
