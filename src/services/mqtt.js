@@ -30,6 +30,7 @@ class MQTTService {
       this.subscriptions.forEach((callback, topic) => {
         this.subscribe(topic, callback)
       })
+      this.publish('frontend/state', 'Inicio')
     })
 
     this.client.on('error', (error) => {
