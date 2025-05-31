@@ -11,13 +11,15 @@ class MQTTService {
 
   connect() {
     // Usar WebSocket para MQTT
-    const brokerUrl = import.meta.env.VITE_MQTT_BROKER_URL || 'ws://localhost:9001'
+    const brokerUrl = import.meta.env.VITE_MQTT_BROKER_URL || 'wss://42868a8f86294ca1bcb46d95ed80ff5d.s1.eu.hivemq.cloud:8884/mqtt'
     
     this.client = mqtt.connect(brokerUrl, {
       clientId: 'auto_electrico_frontend_' + Math.random().toString(16).substr(2, 8),
       clean: true,
       connectTimeout: 4000,
       reconnectPeriod: 1000,
+      username: 'untref',
+      password: 'Untref2025'
     })
 
     this.client.on('connect', () => {
