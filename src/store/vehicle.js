@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, watch } from 'vue'
 import { playHorn, startEngineSound, stopEngineSound, updateEngineSound } from '@/utils/sounds'
+import { mqttService } from '@/services/mqtt'
 
 export const useVehicleStore = defineStore('vehicle', () => {
   // Estado básico
-  const batteryLevel = ref(20)
+  const batteryLevel = ref(80)
   const isEngineOn = ref(false)
   const lights = ref({
     front: false,
@@ -291,6 +292,61 @@ export const useVehicleStore = defineStore('vehicle', () => {
   onUnmounted(() => {
     stopSimulation()
   })
+
+  // Publicar automáticamente el nivel de batería
+  watch(batteryLevel, (nuevoNivel) => {
+    mqttService.publishBatteryLevel(nuevoNivel)
+  })
+
+  // Publicar automáticamente el estado del motor
+  watch(isEngineOn, (nuevoEstado) => {
+    mqttService.publishMotorState({ running: nuevoEstado })
+  })
+
+  // Publicar automáticamente el estado de las luces
+  watch(lights, (nuevasLuces) => {
+    mqttService.publishLightsState(nuevasLuces)
+  }, { deep: true })
+
+  // Publicar automáticamente la ubicación
+  watch(location, (nuevaUbicacion) => {
+    mqttService.publishLocation(nuevaUbicacion.lat, nuevaUbicacion.lng)
+  }, { deep: true })
+
+  // Publicar automáticamente el estado de las puertas
+  watch(doors, (nuevasPuertas) => {
+    mqttService.publish('vehicle/doors', nuevasPuertas)
+  }, { deep: true })
+
+  // Publicar automáticamente el estado de los cinturones
+  watch(seatbelts, (nuevosCinturones) => {
+    mqttService.publish('vehicle/seatbelts', nuevosCinturones)
+  }, { deep: true })
+
+  // Publicar automáticamente el estado de las ventanas
+  watch(windows, (nuevasVentanas) => {
+    mqttService.publish('vehicle/windows', nuevasVentanas)
+  }, { deep: true })
+
+  // Publicar automáticamente el estado de las luces de emergencia
+  watch(hazardLights, (nuevoEstado) => {
+    mqttService.publish('vehicle/hazardLights', { hazard: nuevoEstado })
+  })
+
+  // Publicar automáticamente el estado de la bocina
+  watch(horn, (nuevoEstado) => {
+    mqttService.publish('vehicle/horn', { horn: nuevoEstado })
+  })
+
+  // Publicar automáticamente el rendimiento del motor
+  watch(motorPerformance, (nuevoRendimiento) => {
+    mqttService.publish('vehicle/motor/performance', nuevoRendimiento)
+  }, { deep: true })
+
+  // Publicar automáticamente el consumo energético
+  watch(energyConsumption, (nuevoConsumo) => {
+    mqttService.publish('vehicle/energy', nuevoConsumo)
+  }, { deep: true })
 
   return {
     // Estado

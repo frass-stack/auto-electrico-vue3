@@ -21,7 +21,7 @@ class MQTTService {
       username: 'untref',
       password: 'Untref2025'
     })
-    // Manejar evento de conexión
+
     this.client.on('connect', () => {
       console.log('Conectado al broker MQTT')
       this.connected.value = true
@@ -30,7 +30,7 @@ class MQTTService {
         this.subscribe(topic, callback)
       })
       // Publicar mensaje inicial indicando que la aplicación está activa
-      this.publish('frontend/state', 'Inicio')
+      this.publish('frontend/state', { status: 'Inicio', timestamp: new Date().toISOString() })
     })
 
     this.client.on('error', (error) => {
@@ -46,8 +46,19 @@ class MQTTService {
           callback(payload)
         } catch (error) {
           console.error('Error al procesar mensaje MQTT:', error)
+          // Si el mensaje no es JSON, pasarlo como string
+          callback(message.toString())
         }
       }
+    })
+
+    this.client.on('reconnect', () => {
+      console.log('Reconectando al broker MQTT...')
+    })
+
+    this.client.on('close', () => {
+      console.log('Conexión MQTT cerrada')
+      this.connected.value = false
     })
   }
 
@@ -59,11 +70,12 @@ class MQTTService {
   }
 
   subscribe(topic, callback) {
-    const fullTopic = `${this.topic_prefix}/${topic}`
+    // No agregar el prefijo si el tópico ya lo incluye
+    const fullTopic = topic.startsWith(this.topic_prefix) ? topic : `${this.topic_prefix}/${topic}`
     this.subscriptions.set(fullTopic, callback)
 
     if (this.client && this.connected.value) {
-      this.client.subscribe(fullTopic, (error) => {
+      this.client.subscribe(fullTopic, { qos: 1 }, (error) => {
         if (error) {
           console.error('Error al suscribirse al topic:', fullTopic, error)
         } else {
@@ -79,33 +91,56 @@ class MQTTService {
       return
     }
 
-    const fullTopic = `${this.topic_prefix}/${topic}`
-    this.client.publish(fullTopic, JSON.stringify(message), { qos: 1 }, (error) => {
+    // No agregar el prefijo si el tópico ya lo incluye
+    const fullTopic = topic.startsWith(this.topic_prefix) ? topic : `${this.topic_prefix}/${topic}`
+    
+    // Asegurarse de que el mensaje sea un objeto o string
+    const payload = typeof message === 'object' ? JSON.stringify(message) : message.toString()
+    
+    this.client.publish(fullTopic, payload, { qos: 1 }, (error) => {
       if (error) {
         console.error('Error al publicar mensaje:', error)
+      } else {
+        console.log('Mensaje publicado en:', fullTopic, payload)
       }
     })
   }
 
   // Métodos específicos para el auto eléctrico
   publishVehicleState(state) {
-    this.publish('vehicle/state', state)
+    this.publish('vehicle/state', {
+      ...state,
+      timestamp: new Date().toISOString()
+    })
   }
 
   publishBatteryLevel(level) {
-    this.publish('vehicle/battery', { level })
+    this.publish('vehicle/battery', {
+      level,
+      timestamp: new Date().toISOString()
+    })
   }
 
   publishLocation(latitude, longitude) {
-    this.publish('vehicle/location', { latitude, longitude })
+    this.publish('vehicle/location', {
+      latitude,
+      longitude,
+      timestamp: new Date().toISOString()
+    })
   }
 
   publishMotorState(state) {
-    this.publish('vehicle/motor', state)
+    this.publish('vehicle/motor', {
+      ...state,
+      timestamp: new Date().toISOString()
+    })
   }
 
   publishLightsState(state) {
-    this.publish('vehicle/lights', state)
+    this.publish('vehicle/lights', {
+      ...state,
+      timestamp: new Date().toISOString()
+    })
   }
 
   // Suscripciones a comandos del backend
