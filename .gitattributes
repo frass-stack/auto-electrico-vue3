@@ -1,0 +1,1 @@
+dist_electron/linux-unpacked/auto-prueba filter=lfs diff=lfs merge=lfs -text

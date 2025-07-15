@@ -1,0 +1,54 @@
+{
+  "name": "auto-prueba",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron:dev": "cross-env NODE_ENV=development electron electron/main.cjs",
+    "electron:build": "electron-builder"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "@zxing/library": "^0.21.3",
+    "axios": "^1.4.0",
+    "chart.js": "^4.4.8",
+    "leaflet": "^1.9.4",
+    "mqtt": "^5.12.0",
+    "pinia": "^2.1.4",
+    "qrcode.vue": "^3.6.0",
+    "vue": "^3.2.47",
+    "vue-router": "^4.2.2",
+    "vue-toastification": "^2.0.0-rc.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "^36.3.2",
+    "electron-builder": "^26.0.12",
+    "vite": "^4.3.9"
+  },
+  "build": {
+    "appId": "com.tuempresa.auto-electrico",
+    "productName": "Auto Eléctrico",
+    "directories": {
+      "output": "dist_electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "main": "electron/main.cjs"
+}
