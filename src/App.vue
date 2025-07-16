@@ -16,8 +16,8 @@
         <div class="header-right">
           <div class="user-info">
             <span>{{ user?.name }}</span>
-            <span class="user-role" :class="{ 'owner': user?.role === 'Owner' }">
-              {{ user?.role === 'Owner' ? 'Propietario' : 'Invitado' }}
+            <span class="user-role" :class="{ 'owner': user?.userRole === 1 }">
+              {{ user?.userRole === 1 ? 'Propietario' : 'Invitado' }}
             </span>
             <button class="test-mqtt-button" @click="testMQTT" title="Probar conexión MQTT">
               <i class="fas fa-broadcast-tower"></i>
@@ -89,7 +89,7 @@ export default {
     const user = computed(() => authStore.user)
     const filteredNavigationRoutes = computed(() => {
       return NAVIGATION_ROUTES.filter(route => 
-        !route.requiresOwner || user.value?.role === 'owner'
+        !route.requiresOwner || authStore.isOwner
       )
     })
 

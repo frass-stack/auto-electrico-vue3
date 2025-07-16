@@ -27,7 +27,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
-  } else if (to.meta.requiresOwner && authStore.user?.role !== 'owner') {
+  } else if (to.meta.requiresOwner && !authStore.isOwner) {
     next('/dashboard')
   } else if (to.path === '/login' && isAuthenticated) {
     next('/dashboard')

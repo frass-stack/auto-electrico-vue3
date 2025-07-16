@@ -83,8 +83,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const getAuthorizedDrivers = async () => {
+    try {
+      loading.value = true
+      error.value = null
+
+      const response = await authService.carAuthorizedDrivers()
+
+      if (response.success) {
+        return response.authorizedDrivers
+      } else {
+        throw new Error(response.error)
+      }
+    } catch (err) {
+      error.value = err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   const removeGuest = async (guestId) => {
-    if (!user.value || user.value.role !== 'Owner') {
+    if (!user.value || !isOwner.value) {
       throw new Error('No tienes permisos para realizar esta acción')
     }
   }
@@ -125,15 +145,23 @@ export const useAuthStore = defineStore('auth', () => {
     return result
   })
 
+  // Computed property para verificar si el usuario es owner
+  const isOwner = computed(() => {
+    const result = user.value?.userRole === 1
+    return result
+  })
+
   return {
     user,
     token,
     loading,
     error,
     isAuthenticated,
+    isOwner,
     login,
     logout,
     checkAuth,
+    getAuthorizedDrivers,
     //register,
     removeGuest,
     forceInitialize

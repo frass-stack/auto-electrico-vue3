@@ -85,7 +85,7 @@ export default {
   name: 'GuestManagementView',
   setup() {
     const authStore = useAuthStore()
-    const guests = ref([])
+    const authorizedDrivers = ref([])
     const loading = ref(false)
     const error = ref('')
 
@@ -95,8 +95,13 @@ export default {
       password: ''
     })
 
-    const loadGuests = () => {
-      guests.value = authStore.getGuestUsers()
+    const loadGuests = async () => {
+      try {
+        authorizedDrivers.value = await authStore.getAuthorizedDrivers()
+      } catch (err) {
+        error.value = err.message
+        console.error('Error cargando conductores autorizados:', err)
+      }
     }
 
     const handleAddGuest = async () => {
@@ -105,21 +110,26 @@ export default {
       error.value = ''
 
       try {
-        await authStore.register({
-          ...newGuest.value,
-          role: 'guest',
-          ownerId: authStore.user.id
-        })
+        // TODO: Implementar la función register en el authStore
+        // await authStore.register({
+        //   ...newGuest.value,
+        //   role: 'guest',
+        //   ownerId: authStore.user.id
+        // })
+        
+        // Por ahora, mostrar mensaje de que la funcionalidad está en desarrollo
+        error.value = 'Funcionalidad de agregar invitados en desarrollo'
+        return
 
         // Limpiar formulario
         newGuest.value = {
           name: '',
           email: '',
-          password: ''
+          pin: ''
         }
 
         // Recargar lista de invitados
-        loadGuests()
+        await loadGuests()
       } catch (err) {
         error.value = err.message
       } finally {
@@ -134,7 +144,7 @@ export default {
 
       try {
         await authStore.removeGuest(guestId)
-        loadGuests()
+        await loadGuests()
       } catch (err) {
         error.value = err.message
       } finally {
@@ -142,12 +152,12 @@ export default {
       }
     }
 
-    onMounted(() => {
-      loadGuests()
+    onMounted(async () => {
+      await loadGuests()
     })
 
     return {
-      guests,
+      guests: authorizedDrivers,
       newGuest,
       loading,
       error,

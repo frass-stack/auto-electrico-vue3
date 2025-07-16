@@ -112,12 +112,6 @@ export default {
 
     const handleBackendLogin = async () => {
       try {
-        console.log('🔍 Iniciando login con:', {
-          userName: userName.value,
-          pin: pin.value,
-          endpoint: '/api/Authentication/Login'
-        })
-        
         const result = await authStore.login({
           userName: userName.value,
           pin: pin.value
