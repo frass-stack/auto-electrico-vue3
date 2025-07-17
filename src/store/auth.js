@@ -103,6 +103,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const register = async ({ userName, email, pin }) => {
+    try {
+      loading.value = true
+      error.value = null
+
+      const response = await authService.register({ userName, email, pin })
+
+      if (response.success) {
+        return response.user
+      } else {
+        throw new Error(response.error)
+      }
+    } catch (err) {
+      error.value = err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   const removeGuest = async (guestId) => {
     if (!user.value || !isOwner.value) {
       throw new Error('No tienes permisos para realizar esta acción')
@@ -162,7 +182,7 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     checkAuth,
     getAuthorizedDrivers,
-    //register,
+    register,
     removeGuest,
     forceInitialize
   }

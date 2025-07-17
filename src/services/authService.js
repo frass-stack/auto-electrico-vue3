@@ -192,7 +192,12 @@ export const authService = {
                     }
                 }
             } else if (error.request) {
-                errorMessage = 'No se pudo conectar con el servidor. Verifique la conexión.'
+                // Error de red - sin respuesta del servidor
+                if (error.code === 'ECONNREFUSED' || error.message.includes('ECONNREFUSED')) {
+                    errorMessage = 'No se puede conectar con el servidor Verifique la conexión.'
+                } else {
+                    errorMessage = 'No se pudo conectar con el servidor. Verifique la conexión.'
+                }
             } else {
                 errorMessage = error.message || 'Error obteniendo conductores autorizados'
             }
@@ -203,6 +208,86 @@ export const authService = {
             }
         }
     },
+
+    async register({ userName, email, pin }) {
+        try {
+            const savedToken = localStorage.getItem('auth_token')
+            if (savedToken) {
+                authApi.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`
+            }
+            const response = await authApi.post('/Authentication/CarAuthorizeDriver', {
+                userName,
+                pin,
+                email
+            })
+
+            // Verificar que la respuesta tenga la estructura esperada
+            if (!response.data?.result && !response.data?.statusResponse) {
+                // Si no tiene la estructura estándar, verificar si hay éxito directo
+                if (response.data?.success) {
+                    return {
+                        success: true,
+                        user: response.data.user
+                    }
+                } else {
+                    throw new Error(response.data?.message || 'Error al registrar usuario')
+                }
+            }
+
+            const { result, statusResponse } = response.data
+
+            // Verificar el estado de la respuesta usando el patrón estándar
+            if (statusResponse.code !== 200) {
+                throw new Error(statusResponse.messages || 'Error al registrar usuario')
+            }
+
+            return {
+                success: true,
+                user: result.user || result
+            }
+        } catch (error) {
+            let errorMessage
+
+            if (error.response) {
+                // Manejar errores específicos del backend
+                if (error.response.data?.statusResponse) {
+                    errorMessage = error.response.data.statusResponse.messages || 'Error del servidor'
+                } else {
+                    switch (error.response.status) {
+                        case 400:
+                            errorMessage = 'Datos inválidos para el registro'
+                            break
+                        case 401:
+                            errorMessage = 'No autorizado. Inicie sesión nuevamente'
+                            break
+                        case 403:
+                            errorMessage = 'Acceso denegado'
+                            break
+                        case 404:
+                            errorMessage = 'Servicio no encontrado'
+                            break
+                        case 409:
+                            errorMessage = 'El usuario ya existe'
+                            break
+                        case 500:
+                            errorMessage = 'Error interno del servidor'
+                            break
+                        default:
+                            errorMessage = error.response.data?.message || 'Error desconocido'
+                    }
+                }
+            } else if (error.request) {
+                errorMessage = 'No se pudo conectar con el servidor. Verifique la conexión.'
+            } else {
+                errorMessage = error.message || 'Error de registro'
+            }
+
+            return {
+                success: false,
+                error: errorMessage
+            }
+        }
+    }
 }
 
 export default authService

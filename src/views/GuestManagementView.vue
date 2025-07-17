@@ -29,18 +29,22 @@
         </div>
 
         <div class="form-group">
-          <label for="password">Contraseña temporal</label>
+          <label for="pin">Pin</label>
           <input 
-            type="password" 
-            id="password" 
-            v-model="newGuest.password" 
-            required 
-            placeholder="••••••••"
+              type="number" 
+              id="pin" 
+              v-model.number="newGuest.pin" 
+              required 
+              placeholder="Ingresa tu PIN"
           >
         </div>
 
         <div v-if="error" class="error-message">
           {{ error }}
+        </div>
+
+        <div v-if="successMessage" class="success-message">
+          {{ successMessage }}
         </div>
 
         <button type="submit" class="submit-button" :disabled="loading">
@@ -52,9 +56,22 @@
     <!-- Lista de invitados -->
     <div class="guest-card">
       <h3>Usuarios Invitados</h3>
-      <div v-if="guests.length === 0" class="empty-state">
-        No hay usuarios invitados registrados
+      
+      <!-- Mostrar error de conexión si existe -->
+      <div v-if="error" class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+        <button @click="retryLoadGuests" class="retry-button" :disabled="loading">
+          <i class="fas fa-sync-alt"></i>
+          {{ loading ? 'Reintentando...' : 'Reintentar' }}
+        </button>
       </div>
+      
+      <div v-else-if="guests.length === 0" class="empty-state">
+        <i class="fas fa-users"></i>
+        <p>No hay usuarios invitados registrados</p>
+      </div>
+      
       <div v-else class="guest-list">
         <div v-for="guest in guests" :key="guest.id" class="guest-item">
           <div class="guest-info">
@@ -88,47 +105,67 @@ export default {
     const authorizedDrivers = ref([])
     const loading = ref(false)
     const error = ref('')
+    const successMessage = ref('')
 
     const newGuest = ref({
       name: '',
       email: '',
-      password: ''
+      pin: 0,
     })
 
     const loadGuests = async () => {
       try {
         authorizedDrivers.value = await authStore.getAuthorizedDrivers()
       } catch (err) {
-        error.value = err.message
+        // Manejar diferentes tipos de errores
+        if (err.message.includes('No se pudo conectar con el servidor')) {
+          error.value = 'No se puede conectar con el servidor. Verifique que el backend esté ejecutándose en localhost:7263'
+        } else if (err.message.includes('Network Error') || err.message.includes('ECONNREFUSED')) {
+          error.value = 'Error de conexión: El servidor backend no está disponible'
+        } else {
+          error.value = `Error cargando conductores: ${err.message}`
+        }
         console.error('Error cargando conductores autorizados:', err)
+        
+        // Establecer lista vacía para que la UI funcione
+        authorizedDrivers.value = []
       }
+    }
+
+    const retryLoadGuests = async () => {
+      error.value = '' // Limpiar error anterior
+      await loadGuests()
     }
 
     const handleAddGuest = async () => {
       if (loading.value) return
       loading.value = true
       error.value = ''
+      successMessage.value = ''
 
       try {
-        // TODO: Implementar la función register en el authStore
-        // await authStore.register({
-        //   ...newGuest.value,
-        //   role: 'guest',
-        //   ownerId: authStore.user.id
-        // })
+        await authStore.register({
+          userName: newGuest.value.name,
+          email: newGuest.value.email,
+          pin: newGuest.value.pin
+        })
+
+        // Mostrar mensaje de éxito
+        successMessage.value = 'Usuario agregado exitosamente'
         
-        // Por ahora, mostrar mensaje de que la funcionalidad está en desarrollo
-        error.value = 'Funcionalidad de agregar invitados en desarrollo'
-        return
+        // Limpiar mensaje de éxito después de 3 segundos
+        setTimeout(() => {
+          successMessage.value = ''
+        }, 3000)
 
         // Limpiar formulario
         newGuest.value = {
           name: '',
           email: '',
-          pin: ''
+          pin: 0
         }
 
-        // Recargar lista de invitados
+        //Recargar lista de invitados
         await loadGuests()
       } catch (err) {
         error.value = err.message
@@ -161,8 +198,10 @@ export default {
       newGuest,
       loading,
       error,
+      successMessage,
       handleAddGuest,
-      handleRemoveGuest
+      handleRemoveGuest,
+      retryLoadGuests
     }
   }
 }
@@ -248,6 +287,20 @@ input:focus {
 .error-message {
   background-color: #ff44441a;
   color: #ff4444;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-message {
+  background-color: #4caf501a;
+  color: #4caf50;
   padding: 1rem;
   border-radius: 0.5rem;
   margin-bottom: 1rem;
@@ -256,7 +309,11 @@ input:focus {
 .empty-state {
   color: var(--text-color-light);
   text-align: center;
-  padding: 2rem;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .guest-list {
@@ -309,5 +366,44 @@ input:focus {
 
 .delete-button i {
   font-size: 0.875rem;
+}
+
+.retry-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  transition: all var(--transition-speed);
+  font-size: 0.875rem;
+}
+
+.retry-button:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.retry-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.retry-button i {
+  font-size: 0.875rem;
+}
+
+.retry-button:disabled i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style> 
