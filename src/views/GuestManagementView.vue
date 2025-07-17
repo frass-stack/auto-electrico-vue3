@@ -178,9 +178,20 @@ export default {
       if (loading.value) return
       loading.value = true
       error.value = ''
+      successMessage.value = ''
 
       try {
         await authStore.removeGuest(guestId)
+        
+        // Mostrar mensaje de éxito
+        successMessage.value = 'Usuario eliminado exitosamente'
+        
+        // Limpiar mensaje de éxito después de 3 segundos
+        setTimeout(() => {
+          successMessage.value = ''
+        }, 3000)
+
+        // Recargar lista de invitados
         await loadGuests()
       } catch (err) {
         error.value = err.message

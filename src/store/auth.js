@@ -127,6 +127,29 @@ export const useAuthStore = defineStore('auth', () => {
     if (!user.value || !isOwner.value) {
       throw new Error('No tienes permisos para realizar esta acción')
     }
+    else if (!guestId) {
+      throw new Error('ID no válido')
+    }
+    else {
+      loading.value = true
+      error.value = null
+
+      try {
+        const response = await authService.removeGuest({ guestId })
+
+        if (response.success) {
+          // Actualizar el estado del store si es necesario
+          return response.result || 'Usuario eliminado exitosamente'
+        } else {
+          throw new Error(response.error)
+        }
+      } catch (error) {
+        error.value = error.message
+        throw error
+      } finally {
+        loading.value = false
+      }
+    }
   }
 
   const logout = async () => {

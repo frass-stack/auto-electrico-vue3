@@ -287,7 +287,92 @@ export const authService = {
                 error: errorMessage
             }
         }
-    }
+    },
+
+    async removeGuest({ guestId }) {
+        try {
+            const savedToken = localStorage.getItem('auth_token')
+            if (savedToken) {
+                authApi.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`
+            }
+            // El endpoint espera el id en el body como { id: guestId }
+            const response = await authApi.delete('/Authentication/CarDeleteDriver', {
+                data: { id: guestId }
+            })
+
+            // Verificar que hay una respuesta válida
+            if (!response.data) {
+                throw new Error('No se recibió respuesta del servidor')
+            }
+
+            // Manejar diferentes formatos de respuesta
+            if (response.data.statusResponse) {
+                // Formato estándar con statusResponse
+                const { result, statusResponse } = response.data
+
+                if (statusResponse.code !== 200) {
+                    throw new Error(statusResponse.messages || 'Error al eliminar invitado')
+                }
+
+                return {
+                    success: true,
+                    result
+                }
+            } else if (response.status === 200 || response.status === 204) {
+                // Respuesta exitosa sin estructura estándar (código 200 o 204 No Content)
+                return {
+                    success: true,
+                    result: response.data || 'Usuario eliminado exitosamente'
+                }
+            } else {
+                // Formato no reconocido pero respuesta exitosa
+                return {
+                    success: true,
+                    result: response.data
+                }
+            }
+        } catch (error) {
+            let errorMessage
+
+            if (error.response) {
+                if (error.response.data?.statusResponse) {
+                    errorMessage = error.response.data.statusResponse.messages || 'Error del servidor'
+                } else {
+                    switch (error.response.status) {
+                        case 400:
+                            errorMessage = 'Datos inválidos para la eliminación'
+                            break
+                        case 401:
+                            errorMessage = 'No autorizado. Inicie sesión nuevamente'
+                            break
+                        case 403:
+                            errorMessage = 'Acceso denegado'
+                            break
+                        case 404:
+                            errorMessage = 'Usuario no encontrado'
+                            break
+                        case 409:
+                            errorMessage = 'Conflicto al eliminar usuario'
+                            break
+                        case 500:
+                            errorMessage = 'Error interno del servidor'
+                            break
+                        default:
+                            errorMessage = error.response.data?.message || 'Error desconocido'
+                    }
+                }
+            } else if (error.request) {
+                errorMessage = 'No se pudo conectar con el servidor. Verifique la conexión.'
+            } else {
+                errorMessage = error.message || 'Error al eliminar invitado'
+            }
+
+            return {
+                success: false,
+                error: errorMessage
+            }
+        }
+    },
 }
 
 export default authService
