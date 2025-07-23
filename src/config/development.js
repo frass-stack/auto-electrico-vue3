@@ -1,6 +1,6 @@
 // Configuración para desarrollo local
 // Este archivo agrega configuraciones específicas para desarrollo
-import { env } from './environment'
+import { env } from './environment.js'
 
 // Configuración para desarrollo - solo mostrar información
 if (env.isDevelopment) {

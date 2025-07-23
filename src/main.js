@@ -9,7 +9,7 @@ import "vue-toastification/dist/index.css";
 import { mqttService } from './services/mqtt'
 
 // Importar configuración de entorno para asegurar que se cargue al inicio
-import { env } from './config/environment'
+import { env } from './config/environment.js'
 
 // Crear la aplicación Vue
 const app = createApp(App);

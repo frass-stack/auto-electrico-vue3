@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { env } from '@/config/environment'
+import { env } from '@/config/environment.js'
 
 // Crear instancia de axios usando la configuración centralizada
 const api = axios.create({
