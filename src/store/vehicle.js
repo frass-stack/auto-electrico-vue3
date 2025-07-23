@@ -281,8 +281,10 @@ export const useVehicleStore = defineStore('vehicle', () => {
     if (payload.lucesAltasYBajas !== undefined) {
       if (payload.lucesAltasYBajas) {
         mqttService.publish('/LuzBaja/Prender', { luzBaja: true, timestamp: new Date().toISOString() })
+        mqttService.publish('/LuzAlta/Prender', { luzAlta: true, timestamp: new Date().toISOString() })
       } else {
         mqttService.publish('/LuzBaja/Apagar', { luzBaja: false, timestamp: new Date().toISOString() })
+        mqttService.publish('/LuzAlta/Apagar', { luzAlta: false, timestamp: new Date().toISOString() })
       }
     }
     if (payload.luzInterior !== undefined) {
