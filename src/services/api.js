@@ -1,13 +1,19 @@
 import axios from 'axios'
+import { env } from '@/config/environment'
 
-// Crear instancia de axios
+// Crear instancia de axios usando la configuración centralizada
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  baseURL: env.backendUrl,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }
 })
+
+// Log de configuración en desarrollo
+if (env.isDevelopment && env.debug) {
+  console.log('🌐 API configurada con baseURL:', env.backendUrl)
+}
 
 // Interceptor para manejar errores
 api.interceptors.response.use(

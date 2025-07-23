@@ -1,17 +1,26 @@
 // Configuración para desarrollo local
 // Este archivo agrega configuraciones específicas para desarrollo
+import { env } from './environment'
 
 // Configuración para desarrollo - solo mostrar información
-if (import.meta.env.VITE_APP_ENV === 'development') {
+if (env.isDevelopment) {
     console.log('Modo desarrollo - Configurando para HTTPS local')
-    console.log('API URL:', import.meta.env.VITE_API_URL)
+    console.log('API URL:', env.apiUrl)
+    console.log('Backend URL:', env.backendUrl)
+    console.log('Variables de entorno cargadas:', {
+        VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
+        VITE_API_URL: import.meta.env.VITE_API_URL,
+        VITE_APP_ENV: import.meta.env.VITE_APP_ENV,
+        VITE_DEBUG: import.meta.env.VITE_DEBUG
+    })
 }
 
 export const config = {
-    apiUrl: import.meta.env.VITE_API_URL || 'https://localhost:7263/api',
-    isProduction: import.meta.env.PROD,
-    isDevelopment: import.meta.env.DEV,
-    debugMode: import.meta.env.VITE_DEBUG === 'true'
+    apiUrl: env.backendUrl,
+    backendUrl: env.backendUrl,
+    isProduction: env.isProduction,
+    isDevelopment: env.isDevelopment,
+    debugMode: env.debug
 }
 
 export default config

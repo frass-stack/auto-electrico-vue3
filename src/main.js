@@ -8,6 +8,9 @@ import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { mqttService } from './services/mqtt'
 
+// Importar configuración de entorno para asegurar que se cargue al inicio
+import { env } from './config/environment'
+
 // Crear la aplicación Vue
 const app = createApp(App);
 mqttService.connect();
